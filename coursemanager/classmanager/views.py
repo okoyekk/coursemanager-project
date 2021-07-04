@@ -20,3 +20,7 @@ def logout_view(request):
 
 def register(request):
     return render(request, "classmanager/register.html")
+
+
+def contact_us(request):
+    return render(request, "classmanager/contact_us.html")
