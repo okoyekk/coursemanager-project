@@ -2,4 +2,13 @@
 
 {% block body %}
   <h1>Login</h1>
+  <!-- User Login form -->
+  <form action="{% url 'login' %}" method="post" id="login-form">
+    {% csrf_token %}
+    {{ login_form.as_p }}
+    <button class="btn btn-outline-primary" type="submit">Login</button>
+  </form>
+
+  <a href="#">Forgot Password?</a>
 {% endblock body %}
+<!-- TODO forgot password route -->

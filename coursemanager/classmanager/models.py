@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import date
 
+
 # Create your models here.
 class User(AbstractUser):
     pass
@@ -47,5 +48,5 @@ class Instructor(models.Model):
     department = models.CharField(max_length=20, choices=DEPARTMENTS, default="Other")
 
     def __str__(self):
-        return f"Name: {self.user.first_name} {self.user.last_name}, DoB: {self.date_of_birth},"\
+        return f"Name: {self.user.first_name} {self.user.last_name}, DoB: {self.date_of_birth}," \
                f" Department: {self.department}, Email: {self.user.email}"
