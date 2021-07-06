@@ -136,4 +136,3 @@ def contact_us(request):
 # Check if user has created a Student or Instructor account already
 def has_account(request):
     return request.user.is_student or request.user.is_instructor
-
