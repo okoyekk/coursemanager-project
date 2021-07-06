@@ -1,0 +1,29 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+  <h1>Register New User</h1>
+    <!-- User form -->
+  <form action="{% url 'register-user' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input class="form-control" type="text" name="first-name" placeholder="First Name">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="last-name" placeholder="Last Name">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="email" name="email" placeholder="Email Address">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="text" name="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+        </div>
+        <button class="btn btn-outline-primary" id="submit-user" type="submit">Register User</button>
+        <p>Already have an account? <a href="{% url 'login' %}">Log In here.</a></p>
+    </form>
+{% endblock body %}

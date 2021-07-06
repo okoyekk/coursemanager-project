@@ -1,0 +1,11 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+  <h1>Register Instructor Role</h1>
+    <!-- Instructor form -->
+  <form action="{% url 'register-instructor' %}" method="post" id="instructor-form">
+    {% csrf_token %}
+    {{ instructor_form.as_p }}
+    <button class="btn btn-outline-primary" type="submit">Register Instructor</button>
+  </form>
+{% endblock body %}

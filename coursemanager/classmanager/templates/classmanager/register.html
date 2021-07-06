@@ -14,43 +14,15 @@
   <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
   <label class="btn btn-outline-primary" for="btnradio3">Instructor</label>
 </div>
-<div class="register-forms" style="display: none;">
-  <!-- User form -->
-  <form action="{% url 'register' %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <input class="form-control" type="text" name="first-name" placeholder="First Name">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="text" name="last-name" placeholder="Last Name">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="email" name="email" placeholder="Email Address">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="text" name="username" placeholder="Username">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="password" placeholder="Password">
-        </div>
-        <div class="form-group">
-            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
-        </div>
-        <button class="btn btn-outline-primary" id="submit-user" type="submit">Register User</button>
-        <p>Already have an account? <a href="{% url 'login' %}">Log In here.</a></p>
-    </form>
-
-  <!-- Student form -->
-  <form action="{% url 'register' %}" method="post" id="student-form">
-    {% csrf_token %}
-    {{ student_form.as_p }}
-    <button class="btn btn-outline-primary" type="submit">Register Student</button>
+<div class="register-links" style="display: none;">
+  <form action="{% url 'register-user' %}">
+    <input class="btn btn-outline-primary" type="submit" value="Register User" />
   </form>
-  <!-- Instructor form -->
-  <form action="{% url 'register' %}" method="post" id="instructor-form">
-    {% csrf_token %}
-    {{ instructor_form.as_p }}
-    <button class="btn btn-outline-primary" type="submit">Register Instructor</button>
+  <form action="{% url 'register-student' %}">
+      <input class="btn btn-outline-primary" type="submit" value="Register Student" />
+  </form>
+  <form action="{% url 'register-instructor' %}">
+      <input class="btn btn-outline-primary" type="submit" value="Register Instructor" />
   </form>
 </div>
 {% endblock body %}

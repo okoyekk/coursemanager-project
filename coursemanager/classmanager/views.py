@@ -9,6 +9,7 @@ from django.urls import reverse
 from .forms import StudentRegisterForm, InstructorRegisterForm
 from .models import User, Student, Instructor
 
+
 def index(request):
     return render(request, "classmanager/index.html")
 
@@ -46,79 +47,112 @@ def logout_view(request):
 
 
 def register(request):
+    return render(request, "classmanager/register.html")
+
+
+def register_user(request):
     if request.method == 'POST':
-        # check which form was submitted and save if valid
         user_form = request.POST
-        student_form = StudentRegisterForm(request.POST)
-        instructor_form = InstructorRegisterForm(request.POST)
-        context = {
-            'student_form': student_form,
-            'instructor_form': instructor_form,
-        }
+        context = {}
         # if user is not authenticated, try registering them (New user)
         if not request.user.is_authenticated:
             try:
-                first_name = user_form["first-name"]
-                last_name = user_form["last-name"]
-                email = user_form["email"]
                 username = user_form["username"]
                 password = user_form["password"]
-                confirmation = user_form["confirmation"]
                 # Return a new register form if passwords don't match
                 # TODO add javascript validation to avoid this
-                if password != confirmation:
+                if user_form["password"] != user_form["confirmation"]:
                     context['failure_message'] = 'Passwords do not match, please correct it.'
-                    return render(request, "classmanager/register.html", context)
-                # Attempt creating a new user
-                user = User.objects.create_user(username=username, email=email, password=password,
-                                                first_name=first_name, last_name=last_name)
-                user.save()
-                # log in user if it was created without any exception
-                user = authenticate(username=username, password=password)
-                login(request, user)
+                else:
+                    # Attempt creating a new user
+                    user = User.objects.create_user(username=username, email=user_form["email"], password=password,
+                                                    first_name=user_form["first-name"],
+                                                    last_name=user_form["last-name"])
+                    user.save()
+                    # log in user if it was created without any exception
+                    user = authenticate(username=username, password=password)
+                    login(request, user)
             except IntegrityError:
                 context['failure_message'] = 'Sorry, this username is already taken'
-            except KeyError:
-                context['failure_message'] = 'Sorry, you must create a User account and be logged in before you can ' \
-                                             'create a Student or Instructor account '
-            except ValueError:
+            except KeyError or ValueError:
                 context['failure_message'] = 'Form is not valid, please correct it!'
             else:
                 context['success_message'] = 'User created, now fill out either a Student or Instructor form'
-        # only save new student if user is authenticated
-        elif student_form.is_valid() and request.user.is_authenticated:
-            try:
+            return render(request, "classmanager/register_user.html", context)
+    else:
+        return render(request, "classmanager/register_user.html")
+
+
+def register_student(request):
+    if request.method == 'POST':
+        student_form = StudentRegisterForm(request.POST)
+        context = {}
+        # check if form is filled properly and user is authenticated
+        if student_form.is_valid() and request.user.is_authenticated:
+            # check if user already has an account
+            if has_account(request):
+                context['failure_message'] = 'Sorry, you cannot create another Student/Instructor account'
+            else:
                 new_student = student_form.save(commit=False)
                 new_student.user = request.user
                 new_student.save()
-            except IntegrityError:
-                context['failure_message'] = 'Sorry, you cannot create another Student account'
-            else:
                 context['success_message'] = 'Great, you just made a student account, now you can participate in ' \
                                              'classes and submit assignments! '
-        # only save new student if user is authenticated
-        elif instructor_form.is_valid() and request.user.is_authenticated:
-            try:
-                new_instructor = student_form.save(commit=False)
+        else:
+            # Send user error messages based on the situation
+            if not request.user.is_authenticated:
+                context['failure_message'] = 'Sorry, you need a User account to be able to register for a student ' \
+                                             'account '
+            else:
+                context['failure_message'] = 'Sorry, form is not valid, please correct it or refresh it!'
+        return render(request, "classmanager/register_student.html", context)
+    else:
+        student_form = StudentRegisterForm()
+        return render(request, "classmanager/register_student.html", {
+            'student_form': student_form
+        })
+
+
+def register_instructor(request):
+    if request.method == 'POST':
+        instructor_form = InstructorRegisterForm(request.POST)
+        context = {}
+        # check if form is filled properly and user is authenticated
+        if instructor_form.is_valid() and request.user.is_authenticated:
+            # check if user already has an account
+            if has_account(request):
+                context['failure_message'] = 'Sorry, you cannot create another Student/Instructor account'
+            else:
+                new_instructor = instructor_form.save(commit=False)
                 new_instructor.user = request.user
                 new_instructor.save()
-            except IntegrityError:
-                context['failure_message'] = 'Sorry you cannot create another Instructor account'
-            else:
-                context['success_message'] = 'Great, you just made an instructor account, now you can create classes ' \
-                                             'and manage them!'
+                context['success_message'] = 'Great, you just made an Instructor account, now you can manage ' \
+                                             'classes and assignments! '
         else:
-            context['failure_message'] = 'Form is not valid, please correct it!'
-        return render(request, "classmanager/register.html", context)
+            # Send user error messages based on the situation
+            if not request.user.is_authenticated:
+                context['failure_message'] = 'Sorry, you need a User account to be able to register for an Instructor ' \
+                                             'account '
+            else:
+                context['failure_message'] = 'Sorry, form is not valid, please correct it or refresh it!'
+        return render(request, "classmanager/register_instructor.html", context)
     else:
-        # Generate forms and return to user
-        student_form = StudentRegisterForm()
+        # Take user back to index if user is a student
         instructor_form = InstructorRegisterForm()
-        return render(request, "classmanager/register.html", {
-            'student_form': student_form,
+        return render(request, "classmanager/register_instructor.html", {
             'instructor_form': instructor_form
         })
 
 
 def contact_us(request):
     return render(request, "classmanager/contact_us.html")
+
+
+# Check if user has created a Student or Instructor account already
+def has_account(request):
+    x = Student.objects.all().filter(user=request.user).count()
+    y = Instructor.objects.all().filter(user=request.user).count()
+    if x == 0 and y == 0:
+        return False
+    else:
+        return True

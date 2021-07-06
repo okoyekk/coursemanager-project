@@ -31,7 +31,7 @@ class Student(models.Model):
 
     def __str__(self):
         return f"Name: {self.user.first_name} {self.user.last_name}, DoB: {self.date_of_birth}," \
-               f" Major: {self.major}, Standing: {self.standing}, Credits completed: {self.credits}" \
+               f" Major: {self.major}, Standing: {self.standing}, Credits completed: {self.credits}, " \
                f"Email: {self.user.email}"
 
 

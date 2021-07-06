@@ -2,3 +2,4 @@ coursemanager/coursemanager/secret_settings.py
 *.pyc
 /venv/
 /.idea/
+coursemanager/db.sqlite3

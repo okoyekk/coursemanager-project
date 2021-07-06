@@ -5,25 +5,25 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 
-// Make a specific form visible when it is called
-function load_form(form) {
-    // make div visible and all forms in div invisible
-    let form_div = document.querySelector('.register-forms');
-    form_div.style.display = 'block';
-    let forms = form_div.querySelectorAll('form');
-    forms.forEach(element => {
+// Make a specific button visible when it is called
+function load_form(button) {
+    // make div visible and all buttons in div invisible
+    let link_div = document.querySelector('.register-links');
+    link_div.style.display = 'block';
+    let links = link_div.querySelectorAll('form');
+    links.forEach(element => {
         element.style.display = 'none';
     });
     // make only parameter form visible
-    switch (form) {
+    switch (button) {
         case "user":
-            forms[0].style.display = 'block';
+            links[0].style.display = 'block';
             break;
         case "student":
-            forms[1].style.display = 'block';
+            links[1].style.display = 'block';
             break;
         case "instructor":
-            forms[2].style.display = 'block';
+            links[2].style.display = 'block';
             console.log("ins");
             break;
         default:
