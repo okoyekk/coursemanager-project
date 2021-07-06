@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import StudentRegisterForm, InstructorRegisterForm
+from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm
 from .models import User, Student, Instructor
 
 
@@ -20,8 +20,8 @@ def login_view(request):
         # Attempt to sign user in
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
             # Check if authentication successful
             if user is not None:
@@ -29,12 +29,12 @@ def login_view(request):
                 return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "classmanager/login.html", {
-                'login_form': login_form,
+                "login_form": login_form,
                 "failure_message": "Invalid username and/or password."
             })
     else:
         return render(request, "classmanager/login.html", {
-            'login_form': login_form
+            "login_form": login_form
         })
 
 
@@ -51,7 +51,7 @@ def register(request):
 
 
 def register_user(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         user_form = request.POST
         context = {}
         # if user is not authenticated, try registering them (New user)
@@ -62,7 +62,7 @@ def register_user(request):
                 # Return a new register form if passwords don't match
                 # TODO add javascript validation to avoid this
                 if user_form["password"] != user_form["confirmation"]:
-                    context['failure_message'] = 'Passwords do not match, please correct it.'
+                    context["failure_message"] = "Passwords do not match, please correct it."
                 else:
                     # Attempt creating a new user
                     user = User.objects.create_user(username=username, email=user_form["email"], password=password,
@@ -73,11 +73,11 @@ def register_user(request):
                     user = authenticate(username=username, password=password)
                     login(request, user)
             except IntegrityError:
-                context['failure_message'] = 'Sorry, this username is already taken, please try another one!'
+                context["failure_message"] = "Sorry, this username is already taken, please try another one!"
             except KeyError or ValueError:
-                context['failure_message'] = 'Form is not valid, please correct it!'
+                context["failure_message"] = "Form is not valid, please correct it!"
             else:
-                context['success_message'] = 'User created, now fill out either a Student or Instructor form'
+                context["success_message"] = "User created, now fill out either a Student or Instructor form"
             return render(request, "classmanager/register_user.html", context)
     else:
         return render(request, "classmanager/register_user.html")
@@ -85,7 +85,7 @@ def register_user(request):
 
 def register_role(request, role):
     role = role.lower()
-    if request.method == 'POST':
+    if request.method == "POST":
         # make form based on role (Student or Instructor)
         if role == "student":
             form = StudentRegisterForm(request.POST)
@@ -97,13 +97,13 @@ def register_role(request, role):
         if form.is_valid() and request.user.is_authenticated:
             # check if user already has an account
             if has_account(request):
-                context['failure_message'] = 'Sorry, you cannot create another Student/Instructor account'
+                context["failure_message"] = "Sorry, you cannot create another Student/Instructor account"
             else:
                 new_role = form.save(commit=False)
                 new_role.user = request.user
                 new_role.save()
-                context['success_message'] = f'Great, you just made your {role} account, now you can participate in ' \
-                                             'classes and submit assignments! '
+                context["success_message"] = f"Great, you just made your {role} account, now you can participate in " \
+                                             "classes and submit assignments! "
                 # update user role
                 if role == "student":
                     request.user.is_student = True
@@ -112,10 +112,10 @@ def register_role(request, role):
         else:
             # Send user error messages based on the situation
             if not request.user.is_authenticated:
-                context['failure_message'] = f'Sorry, you need a User account to be able to register for your {role} ' \
-                                             'account '
+                context["failure_message"] = f"Sorry, you need a User account to be able to register for your {role} " \
+                                             "account "
             else:
-                context['failure_message'] = 'Sorry, form is not valid, please correct it or refresh it!'
+                context["failure_message"] = "Sorry, form is not valid, please correct it or refresh it!"
         # render form success or failure page based on role
         return render(request, f"classmanager/register_{role}.html", context)
     else:
@@ -125,7 +125,28 @@ def register_role(request, role):
             form = InstructorRegisterForm()
         # render form based on role
         return render(request, f"classmanager/register_{role}.html", {
-            f'{role}_form': form
+            f"{role}_form": form
+        })
+
+
+@login_required
+def create_course(request):
+    if request.method == "POST":
+        context = {}
+        course_form = CourseCreationForm(request.POST)
+        if course_form.is_valid() and request.user.is_instructor:
+            new_course = course_form.save(commit=False)
+            new_course.instructor = Instructor.objects.get(pk=request.user)
+            new_course.save()
+            context["success_message"] = "Course Created Successfully"
+        else:
+            context["failure_message"] = "Your form is either not valid or you do not have permission " \
+                                         "to create a new course!"
+        return render(request, "classmanager/index.html", context)
+    else:
+        course_form = CourseCreationForm()
+        return render(request, "classmanager/create_course.html", {
+            "course_form": course_form
         })
 
 

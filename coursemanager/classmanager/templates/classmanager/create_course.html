@@ -1,0 +1,17 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+    <h1>Create A Course</h1>
+    {% if user.is_instructor %}
+    <form action="{% url 'create-course' %}" method="post">
+        {% csrf_token %}
+        {{course_form.as_p}}
+        <button class="btn btn-outline-primary" type="submit">Create Course</button>
+    </form>
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+        You don't have the permission to create a course, only Instructors do!
+    </div>
+  {% endif %}
+
+{% endblock body %}

@@ -1,0 +1,13 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+  <h1>Join a course</h1>
+  {% if user.is_student %}
+    <p>Form to be added later</p>
+  {% else %}
+    <div class="alert alert-warning" role="alert">
+        You don't have the permission to join a course, only Students do!
+    </div>
+  {% endif %}
+
+{% endblock body %}
