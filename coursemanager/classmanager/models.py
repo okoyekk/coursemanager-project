@@ -5,7 +5,8 @@ from datetime import date
 
 # Create your models here.
 class User(AbstractUser):
-    pass
+    is_student = models.BooleanField(default=False)
+    is_instructor = models.BooleanField(default=False)
 
 
 # Student model that is also a user

@@ -2,4 +2,14 @@
 
 {% block body %}
   <h1>Index</h1>
+
+  {% if user.is_authenticated %}
+  <h3>Welcome, {{user.first_name}} {{user.last_name}}</h3>
+  <h4>Here are some things you can do:</h4>
+  <div class="operations">
+
+  </div>
+
+  {% endif %}
+
 {% endblock body %}

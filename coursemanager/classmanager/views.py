@@ -104,6 +104,11 @@ def register_role(request, role):
                 new_role.save()
                 context['success_message'] = f'Great, you just made your {role} account, now you can participate in ' \
                                              'classes and submit assignments! '
+                # update user role
+                if role == "student":
+                    request.user.is_student = True
+                else:
+                    request.user.is_instructor = True
         else:
             # Send user error messages based on the situation
             if not request.user.is_authenticated:
@@ -130,9 +135,5 @@ def contact_us(request):
 
 # Check if user has created a Student or Instructor account already
 def has_account(request):
-    x = Student.objects.all().filter(user=request.user).count()
-    y = Instructor.objects.all().filter(user=request.user).count()
-    if x == 0 and y == 0:
-        return False
-    else:
-        return True
+    return request.user.is_student or request.user.is_instructor
+
