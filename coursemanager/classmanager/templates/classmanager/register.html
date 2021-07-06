@@ -18,10 +18,10 @@
   <form action="{% url 'register-user' %}">
     <input class="btn btn-outline-primary" type="submit" value="Register User" />
   </form>
-  <form action="{% url 'register-student' %}">
+  <form action="{% url 'register-role' role='student' %}">
       <input class="btn btn-outline-primary" type="submit" value="Register Student" />
   </form>
-  <form action="{% url 'register-instructor' %}">
+  <form action="{% url 'register-role' role='instructor' %}">
       <input class="btn btn-outline-primary" type="submit" value="Register Instructor" />
   </form>
 </div>

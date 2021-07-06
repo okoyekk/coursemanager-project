@@ -73,7 +73,7 @@ def register_user(request):
                     user = authenticate(username=username, password=password)
                     login(request, user)
             except IntegrityError:
-                context['failure_message'] = 'Sorry, this username is already taken'
+                context['failure_message'] = 'Sorry, this username is already taken, please try another one!'
             except KeyError or ValueError:
                 context['failure_message'] = 'Form is not valid, please correct it!'
             else:
@@ -83,64 +83,44 @@ def register_user(request):
         return render(request, "classmanager/register_user.html")
 
 
-def register_student(request):
+def register_role(request, role):
+    role = role.lower()
     if request.method == 'POST':
-        student_form = StudentRegisterForm(request.POST)
+        # make form based on role (Student or Instructor)
+        if role == "student":
+            form = StudentRegisterForm(request.POST)
+        else:
+            form = InstructorRegisterForm(request.POST)
         context = {}
+
         # check if form is filled properly and user is authenticated
-        if student_form.is_valid() and request.user.is_authenticated:
+        if form.is_valid() and request.user.is_authenticated:
             # check if user already has an account
             if has_account(request):
                 context['failure_message'] = 'Sorry, you cannot create another Student/Instructor account'
             else:
-                new_student = student_form.save(commit=False)
-                new_student.user = request.user
-                new_student.save()
-                context['success_message'] = 'Great, you just made a student account, now you can participate in ' \
+                new_role = form.save(commit=False)
+                new_role.user = request.user
+                new_role.save()
+                context['success_message'] = f'Great, you just made your {role} account, now you can participate in ' \
                                              'classes and submit assignments! '
         else:
             # Send user error messages based on the situation
             if not request.user.is_authenticated:
-                context['failure_message'] = 'Sorry, you need a User account to be able to register for a student ' \
+                context['failure_message'] = f'Sorry, you need a User account to be able to register for your {role} ' \
                                              'account '
             else:
                 context['failure_message'] = 'Sorry, form is not valid, please correct it or refresh it!'
-        return render(request, "classmanager/register_student.html", context)
+        # render form success or failure page based on role
+        return render(request, f"classmanager/register_{role}.html", context)
     else:
-        student_form = StudentRegisterForm()
-        return render(request, "classmanager/register_student.html", {
-            'student_form': student_form
-        })
-
-
-def register_instructor(request):
-    if request.method == 'POST':
-        instructor_form = InstructorRegisterForm(request.POST)
-        context = {}
-        # check if form is filled properly and user is authenticated
-        if instructor_form.is_valid() and request.user.is_authenticated:
-            # check if user already has an account
-            if has_account(request):
-                context['failure_message'] = 'Sorry, you cannot create another Student/Instructor account'
-            else:
-                new_instructor = instructor_form.save(commit=False)
-                new_instructor.user = request.user
-                new_instructor.save()
-                context['success_message'] = 'Great, you just made an Instructor account, now you can manage ' \
-                                             'classes and assignments! '
+        if role == "student":
+            form = StudentRegisterForm()
         else:
-            # Send user error messages based on the situation
-            if not request.user.is_authenticated:
-                context['failure_message'] = 'Sorry, you need a User account to be able to register for an Instructor ' \
-                                             'account '
-            else:
-                context['failure_message'] = 'Sorry, form is not valid, please correct it or refresh it!'
-        return render(request, "classmanager/register_instructor.html", context)
-    else:
-        # Take user back to index if user is a student
-        instructor_form = InstructorRegisterForm()
-        return render(request, "classmanager/register_instructor.html", {
-            'instructor_form': instructor_form
+            form = InstructorRegisterForm()
+        # render form based on role
+        return render(request, f"classmanager/register_{role}.html", {
+            f'{role}_form': form
         })
 
 

@@ -3,7 +3,7 @@
 {% block body %}
   <h1>Register Student Role</h1>
     <!-- Student form -->
-  <form action="{% url 'register-student' %}" method="post" id="student-form">
+  <form action="{% url 'register-role' role='student' %}" method="post" id="student-form">
     {% csrf_token %}
     {{ student_form.as_p }}
     <button class="btn btn-outline-primary" type="submit">Register Student</button>
