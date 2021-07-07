@@ -7,7 +7,7 @@
 {% for course in courses %}
 <div class="course-listing">
     <p>{{course}}</p>
-    <form action="{% url 'join-course' course_id=course.id %}" method="GET">
+    <form class="button-form" action="{% url 'join-course' course_id=course.id %}" method="GET">
         <input class="btn btn-primary" type="submit" value="Join" />
     </form>
 

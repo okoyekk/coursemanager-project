@@ -21,7 +21,8 @@ form {
     max-width: 600px;
 }
 
-.join-course-buttons > form {
+/* Class for forms that serve as buttons to a link */
+.button-form {
     margin: auto;
     padding: 5px;
     display: inline;

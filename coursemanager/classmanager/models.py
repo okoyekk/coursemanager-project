@@ -78,7 +78,7 @@ class Course(models.Model):
 class Enrollment(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE)
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"Student: {self.student.user.get_name()} joined {self.course.name} on {self.date_joined}"

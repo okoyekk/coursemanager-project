@@ -1,0 +1,22 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>{{course.name}}</h1>
+{% if user.is_student %}
+<h3>Announcements</h3>
+<h3>Assignments</h3>
+<h3>Submissions</h3>
+{% else %}
+{% if user.is_instructor %}
+<h3>Announcements</h3>
+<h4>Create announcement</h4>
+<h3>Assignments</h3>
+<h4>Create assignment</h4>
+<h3>My Students</h3>
+<h4>Grade Assignments</h4>
+<h5>Give final grades and deactivate course</h5>
+<h5>Delete course</h5>
+{% endif %}
+{% endif %}
+
+{% endblock body %}

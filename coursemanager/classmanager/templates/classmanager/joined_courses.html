@@ -1,0 +1,15 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>My Courses</h1>
+<h4>Here are the all courses you have enrolled for</h4>
+{% for course in courses %}
+<div class="course-listing">
+  <p>{{course}}</p>
+  <form class="button-form" action="{% url 'view-course' course_id=course.id %}" method="GET">
+    <input class="btn btn-primary" type="submit" value="View" />
+  </form>
+
+</div>
+{% endfor %}
+{% endblock body %}

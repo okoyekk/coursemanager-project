@@ -7,17 +7,23 @@
 <div class="operations">
   {% if user.is_instructor %}
   <!-- Create Course -->
-  <form action="{% url 'create-course' %}" method="GET">
+  <form class="button-form" action="{% url 'create-course' %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="Create A Course" />
+  </form>
+  <form class="button-form" action="{% url 'view-created-courses' %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="View created courses" />
   </form>
   <!-- View My courses -->
   {% endif %}
   {% if user.is_student %}
   <!-- View My courses -->
+  <form class="button-form" action="{% url 'view-joined-courses' %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="View my courses" />
+  </form>
   {% endif %}
   <!-- View All Courses (If user is student, they can register for it,
        if they're an instructor, they can delete it if they created it) -->
-  <form action="{% url 'view-courses' %}" method="GET">
+  <form class="button-form" action="{% url 'view-all-courses' %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="View all courses" />
   </form>
 

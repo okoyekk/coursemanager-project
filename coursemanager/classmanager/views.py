@@ -150,9 +150,9 @@ def create_course(request):
         })
 
 
-def view_courses(request):
+def view_all_courses(request):
     # return all active courses
-    courses = Course.objects.filter(is_active=True).order_by('name')
+    courses = Course.objects.filter(is_active=True).order_by("name")
     return render(request, "classmanager/view_courses.html", {
         "courses": courses,
     })
@@ -184,11 +184,70 @@ def join_course(request, course_id):
         return render(request, "classmanager/join_course.html", context)
 
 
+@login_required
 def view_joined_courses(request):
-    pass
+    if request.user.is_student:
+        # if the user is a student, return a template with the joined courses in the context
+        student = Student.objects.get(pk=request.user)
+        courses = Enrollment.objects.filter(student=student)
+        return render(request, "classmanager/joined_courses.html", {
+            "courses": courses
+        })
+    else:
+        # If a user that isn't a student accesses this route, they are sent to the index route
+        return HttpResponseRedirect(reverse("index"))
 
+
+@login_required
 def view_created_courses(request):
-    pass
+    if request.user.is_instructor:
+        instructor = Instructor.objects.get(pk=request.user)
+        courses = Course.objects.filter(instructor=instructor).order_by("date_created")
+        return render(request, "classmanager/created_courses.html", {
+            "courses": courses
+        })
+    else:
+        # If a user that isn't an instructor accesses this route, they are sent to the index route
+        return HttpResponseRedirect(reverse("index"))
+
+
+@login_required
+def view_course(request, course_id):
+    # check if course is valid
+    try:
+        course = Course.objects.get(pk=course_id)
+    except Course.DoesNotExist:
+        return render(request, "classmanager/index.html", {
+            "failure_message": "Sorry, the course you wanted does not exist or was deleted"
+        })
+    if request.user.is_student:
+        # check if student is enrolled in the course
+        student = Student.objects.get(pk=request.user)
+        if len(Enrollment.objects.filter(course=course_id, student=student)) == 0:
+            return render(request, "classmanager/index.html", {
+                "failure_message": "Sorry, you need to join a course in order to view it"
+            })
+        else:
+            return render(request, "classmanager/view_course.html", {
+                "course": course
+            })
+    elif request.user.is_instructor:
+        # check if instructor is the creator of the course
+        instructor = Instructor.objects.get(pk=request.user)
+        if course.instructor == instructor:
+            return render(request, "classmanager/view_course.html", {
+                "course": course
+            })
+        else:
+            return render(request, "classmanager/index.html", {
+                "failure_message": "Sorry, you need to create a course in order to view it"
+            })
+    else:
+        return render(request, "classmanager/index.html", {
+            "failure_message": "Sorry, you need to join a course as a student or create it as an instructor in order "
+                               "to view it "
+        })
+
 
 def contact_us(request):
     return render(request, "classmanager/contact_us.html")

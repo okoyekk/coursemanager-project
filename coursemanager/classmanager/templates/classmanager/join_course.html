@@ -7,11 +7,11 @@
 <h4>Do you want to join "{{course.name}}" taught by {{course.instructor.user.first_name}}
   {{course.instructor.user.last_name}}?</h4>
 <div class="join-course-buttons">
-  <form action="{% url 'join-course' course_id=course.id %}" method="POST">
+  <form class="button-form" action="{% url 'join-course' course_id=course.id %}" method="POST">
     {% csrf_token %}
     <input class="btn btn-primary" type="submit" value="Yes" />
   </form>
-  <form action="{% url 'view-courses' %}" method="GET">
+  <form class="button-form" action="{% url 'view-all-courses' %}" method="GET">
     <input class="btn btn-danger" type="submit" value="No" />
   </form>
 </div>
