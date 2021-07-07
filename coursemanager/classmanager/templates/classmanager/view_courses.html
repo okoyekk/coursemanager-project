@@ -1,0 +1,16 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>View All Courses</h1>
+<h4>Here are currently active courses</h4>
+<!-- todo: use bootstrap cards to style this  -->
+{% for course in courses %}
+<div class="course-listing">
+    <p>{{course}}</p>
+    <form action="{% url 'join-course' course_id=course.id %}" method="GET">
+        <input class="btn btn-primary" type="submit" value="Join" />
+    </form>
+
+</div>
+{% endfor %}
+{% endblock body %}

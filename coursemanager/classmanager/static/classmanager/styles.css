@@ -9,3 +9,20 @@
 .register-forms {
     margin-bottom: 10px;
 }
+
+.course-listing {
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 5px;
+    max-width: 600px;
+}
+
+form {
+    max-width: 600px;
+}
+
+.join-course-buttons > form {
+    margin: auto;
+    padding: 5px;
+    display: inline;
+}

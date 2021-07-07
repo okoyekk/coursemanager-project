@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm
-from .models import User, Student, Instructor
+from .models import User, Student, Instructor, Course, Enrollment
 
 
 def index(request):
@@ -149,6 +149,46 @@ def create_course(request):
             "course_form": course_form
         })
 
+
+def view_courses(request):
+    # return all active courses
+    courses = Course.objects.filter(is_active=True).order_by('name')
+    return render(request, "classmanager/view_courses.html", {
+        "courses": courses,
+    })
+
+
+@login_required
+def join_course(request, course_id):
+    context = {}
+    if request.method == "POST":
+        course = Course.objects.get(pk=course_id)
+        student = Student.objects.get(pk=request.user)
+        context["course"] = course
+        # check if user is already enrolled in that specific course
+        if len(Enrollment.objects.filter(course=course, student=student)) != 0:
+            context["failure_message"] = "Sorry, You cannot join the same course twice"
+            return render(request, "classmanager/join_course.html", context)
+        new_enrollment = Enrollment(course=course, student=student)
+        new_enrollment.save()
+        context["success_message"] = "You have successfully joined this course!"
+        return render(request, "classmanager/join_course.html", context)
+    else:
+        try:
+            course = Course.objects.get(pk=course_id)
+        except Course.DoesNotExist:
+            context["failure_message"] = "Sorry, the course you wanted to join does not exist"
+            return render(request, "classmanager/join_course.html", context)
+        else:
+            context["course"] = course
+        return render(request, "classmanager/join_course.html", context)
+
+
+def view_joined_courses(request):
+    pass
+
+def view_created_courses(request):
+    pass
 
 def contact_us(request):
     return render(request, "classmanager/contact_us.html")

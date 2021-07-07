@@ -1,13 +1,24 @@
 {% extends "classmanager/layout.html" %}
 
 {% block body %}
-  <h1>Join a course</h1>
-  {% if user.is_student %}
-    <p>Form to be added later</p>
-  {% else %}
-    <div class="alert alert-warning" role="alert">
-        You don't have the permission to join a course, only Students do!
-    </div>
-  {% endif %}
+<h1>Join a course</h1>
+{% if user.is_student and course %}
+<!-- Check if user is a student and the course exists -->
+<h4>Do you want to join "{{course.name}}" taught by {{course.instructor.user.first_name}}
+  {{course.instructor.user.last_name}}?</h4>
+<div class="join-course-buttons">
+  <form action="{% url 'join-course' course_id=course.id %}" method="POST">
+    {% csrf_token %}
+    <input class="btn btn-primary" type="submit" value="Yes" />
+  </form>
+  <form action="{% url 'view-courses' %}" method="GET">
+    <input class="btn btn-danger" type="submit" value="No" />
+  </form>
+</div>
+{% else %}
+<div class="alert alert-warning" role="alert">
+  You don't have the permission to join a course, only Students do!
+</div>
+{% endif %}
 
 {% endblock body %}

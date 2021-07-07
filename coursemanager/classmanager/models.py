@@ -69,9 +69,10 @@ class Course(models.Model):
     ]
     department = models.CharField(max_length=20, choices=DEPARTMENTS, default="Other")
     description = models.TextField(max_length=1000, default=None, blank=True)
+    credits = models.PositiveIntegerField(default=2)
 
     def __str__(self):
-        return f"Course Name: {self.name}, Instructor: {self.instructor.user.get_name()}"
+        return f"Course Name: {self.name}, Instructor: {self.instructor.user.get_name()}, credits: {self.credits}"
 
 
 class Enrollment(models.Model):

@@ -1,27 +1,31 @@
 {% extends "classmanager/layout.html" %}
 
 {% block body %}
-  <h1>Index</h1>
-
-  {% if user.is_authenticated %}
-  <h3>Welcome, {{user.first_name}} {{user.last_name}}</h3>
-  <h5>Here are some things you can do:</h5>
-  <div class="operations">
-    {% if user.is_instructor %}
-      <!-- Create Course -->
-      <form action="{% url 'create-course' %}" method="GET">
-        <input class="btn btn-outline-primary" type="submit" value="Create A Course" />
-      </form>
-      <!-- View My courses -->
-    {% endif %}
-    {% if user.is_student %}
-      <!-- View My courses -->
-    {% endif %}
-    <!-- View All Courses (If user is student, they can register for it,
-       if they're an instructor, they can delete it if they created it) -->
-
-  </div>
-
+{% if user.is_authenticated %}
+<h3>Welcome, {{user.first_name}} {{user.last_name}}</h3>
+<h5>Here are some things you can do:</h5>
+<div class="operations">
+  {% if user.is_instructor %}
+  <!-- Create Course -->
+  <form action="{% url 'create-course' %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Create A Course" />
+  </form>
+  <!-- View My courses -->
   {% endif %}
+  {% if user.is_student %}
+  <!-- View My courses -->
+  {% endif %}
+  <!-- View All Courses (If user is student, they can register for it,
+       if they're an instructor, they can delete it if they created it) -->
+  <form action="{% url 'view-courses' %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="View all courses" />
+  </form>
+
+</div>
+{% else %}
+<!-- What is shown to unauthenticated users - An about page -->
+<h2>Index</h2>
+<h3>Welcome, Guest</h3>
+{% endif %}
 
 {% endblock body %}
