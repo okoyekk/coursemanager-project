@@ -34,9 +34,12 @@ class Student(models.Model):
     credits = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"Name: {self.user.get_name()}, DoB: {self.date_of_birth}," \
+        return f"Name: {self.get_name()}, DoB: {self.date_of_birth}," \
                f" Major: {self.major}, Standing: {self.standing}, Credits completed: {self.credits}, " \
-               f"Email: {self.user.email}"
+               f"Email: {self.user.email}."
+
+    def get_name(self):
+        return self.user.get_name()
 
 
 # Instructor model that is also a user
@@ -52,8 +55,11 @@ class Instructor(models.Model):
     department = models.CharField(max_length=20, choices=DEPARTMENTS, default="Other")
 
     def __str__(self):
-        return f"Name: {self.user.get_name()}, DoB: {self.date_of_birth}," \
-               f" Department: {self.department}, Email: {self.user.email}"
+        return f"Name: {self.get_name()}, DoB: {self.date_of_birth}," \
+               f" Department: {self.department}, Email: {self.user.email}."
+
+    def get_name(self):
+        return self.user.get_name()
 
 
 class Course(models.Model):
@@ -70,9 +76,12 @@ class Course(models.Model):
     department = models.CharField(max_length=20, choices=DEPARTMENTS, default="Other")
     description = models.TextField(max_length=1000, default=None, blank=True)
     credits = models.PositiveIntegerField(default=2)
+    # course length in weeks, default = 10 weeks
+    length = models.PositiveIntegerField(default=10)
 
     def __str__(self):
-        return f"Course Name: {self.name}, Instructor: {self.instructor.user.get_name()}, credits: {self.credits}"
+        return f"Course Name: {self.name}, Instructor: {self.instructor.get_name()}, credits: {self.credits}," \
+               f" length: {self.length} weeks."
 
 
 class Enrollment(models.Model):
@@ -81,4 +90,46 @@ class Enrollment(models.Model):
     date_joined = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Student: {self.student.user.get_name()} joined {self.course.name} on {self.date_joined}"
+        return f"Student: {self.student.get_name()} joined {self.course.name} on {self.date_joined}."
+
+
+class Announcement(models.Model):
+    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    text = models.TextField(max_length=1000, default=None)
+    date_created = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Announcement for '{self.course.name}': {self.text}; Posted by {self.course.instructor.name}," \
+               f" on {self.date_created}."
+
+
+class Assignment(models.Model):
+    title = models.TextField(max_length=255, blank=False)
+    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    file_url = models.URLField(blank=True, max_length=200)
+    description = models.TextField(max_length=1000, blank=True)
+    date_created = models.DateField(auto_now_add=True)
+    due_date = models.DateField(blank=False)
+    points = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"Assignment for '{self.course.name}': '{self.title}'; Due: {self.due_date}, points: {self.points}"
+
+
+class Submission(models.Model):
+    assignment = models.OneToOneField(Assignment, on_delete=models.CASCADE)
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    score = models.PositiveIntegerField(default=0)
+    text = models.TextField(max_length=1000)
+
+    def __str__(self):
+        return f"Submission for '{self.assignment.title}' by '{self.student.get_name()}"
+
+
+class Attendance(models.Model):
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    week = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"'{self.student.get_name()}' attended {self.course.name} in week {self.week}"

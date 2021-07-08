@@ -1,13 +1,13 @@
-from django.db import IntegrityError
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm
-from .models import User, Student, Instructor, Course, Enrollment
+from .models import User, Student, Instructor, Course, Enrollment, Announcement, Assignment, Submission, Attendance
 
 
 def index(request):
@@ -227,18 +227,10 @@ def view_course(request, course_id):
             return render(request, "classmanager/index.html", {
                 "failure_message": "Sorry, you need to join a course in order to view it"
             })
-        else:
-            return render(request, "classmanager/view_course.html", {
-                "course": course
-            })
     elif request.user.is_instructor:
         # check if instructor is the creator of the course
         instructor = Instructor.objects.get(pk=request.user)
-        if course.instructor == instructor:
-            return render(request, "classmanager/view_course.html", {
-                "course": course
-            })
-        else:
+        if course.instructor != instructor:
             return render(request, "classmanager/index.html", {
                 "failure_message": "Sorry, you need to create a course in order to view it"
             })
@@ -247,6 +239,10 @@ def view_course(request, course_id):
             "failure_message": "Sorry, you need to join a course as a student or create it as an instructor in order "
                                "to view it "
         })
+    # get announcements, assignments, attendance and submissions.
+    return render(request, "classmanager/view_course.html", {
+        "course": course
+    })
 
 
 def contact_us(request):
