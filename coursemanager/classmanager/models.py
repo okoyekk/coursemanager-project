@@ -99,7 +99,7 @@ class Announcement(models.Model):
     date_created = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Announcement for '{self.course.name}': {self.text}; Posted by {self.course.instructor.name}," \
+        return f"Announcement for '{self.course.name}': {self.text}; Posted by {self.course.instructor.get_name()}," \
                f" on {self.date_created}."
 
 

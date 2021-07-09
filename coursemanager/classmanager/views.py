@@ -6,7 +6,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm
+from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm, AnnouncementCreationForm,\
+    AssignmentCreationForm, SubmissionForm
 from .models import User, Student, Instructor, Course, Enrollment, Announcement, Assignment, Submission, Attendance
 
 
@@ -243,6 +244,62 @@ def view_course(request, course_id):
     return render(request, "classmanager/view_course.html", {
         "course": course
     })
+
+
+@login_required
+def create_announcement(request, course_id):
+    # check if user is an instructor
+    context = {}
+    if not request.user.is_instructor:
+        context["failure_message"] = "Sorry, you don't have the permission to create an announcement in this course."
+        return render(request, "classmanager/index.html", context)
+    else:
+        # check if user is the instructor of the course
+        course = Course.objects.get(pk=course_id)
+        course_instructor = course.instructor
+        instructor = Instructor.objects.get(pk=request.user)
+        # return failure message if not course instructor
+        if course_instructor != instructor:
+            context["failure_message"] = "Sorry, you don't have the permission to create an announcement in this " \
+                                         "course. "
+            return render(request, "classmanager/index.html", context)
+        context["course"] = course
+
+        if request.method == "POST":
+            announcement_form = AnnouncementCreationForm(request.POST)
+            if announcement_form.is_valid():
+                new_announcement = announcement_form.save(commit=False)
+                new_announcement.course = course
+                new_announcement.save()
+                context["success_message"] = "Course Created Successfully"
+            else:
+                context["failure_message"] = "Sorry, your announcement cannot be blank, please refresh, " \
+                                             "write something and submit again"
+            return render(request, "classmanager/create_announcement.html", context)
+        else:
+            announcement_form = AnnouncementCreationForm()
+            context["announcement_form"] = announcement_form
+            return render(request, "classmanager/create_announcement.html", context)
+
+
+@login_required
+def create_assignment(request, course_id):
+    pass
+
+
+@login_required
+def create_submission(request, course_id, assignment_id):
+    pass
+
+
+@login_required
+def create_attendance(request, course_id):
+    pass
+
+
+@login_required
+def view_my_profile(request):
+    pass
 
 
 def contact_us(request):

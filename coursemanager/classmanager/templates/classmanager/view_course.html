@@ -4,19 +4,33 @@
 <h1>{{course.name}}</h1>
 {% if user.is_student %}
 <h3>Announcements</h3>
+<h4>View announcements</h4>
 <h3>Assignments</h3>
+<h4>View Assignments</h4>
 <h3>Submissions</h3>
-{% else %}
+<h4>View Assignent submissions</h4>
+{% endif %}
+
 {% if user.is_instructor %}
 <h3>Announcements</h3>
 <h4>Create announcement</h4>
+<form class="button-form" action="{% url 'create-announcement' course_id=course.id %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Create an Announcement" />
+</form>
 <h3>Assignments</h3>
 <h4>Create assignment</h4>
+<form class="button-form" action="{% url 'create-assignment' course_id=course.id %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Create an Assignment" />
+</form>
 <h3>My Students</h3>
+<h4>Take Attendance</h4>
+<form class="button-form" action="{% url 'create-attendance' course_id=course.id %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Take Attendance" />
+</form>
 <h4>Grade Assignments</h4>
 <h5>Give final grades and deactivate course</h5>
 <h5>Delete course</h5>
 {% endif %}
-{% endif %}
+
 
 {% endblock body %}

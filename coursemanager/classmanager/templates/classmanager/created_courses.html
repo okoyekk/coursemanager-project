@@ -2,14 +2,17 @@
 
 {% block body %}
 <h1>My Created Courses</h1>
+{% if courses|length > 0 %}
 <h4>Here are all the courses you have created</h4>
+{% endif %}
 {% for course in courses %}
 <div class="course-listing">
   <p>{{course}}</p>
   <form class="button-form" action="{% url 'view-course' course_id=course.id %}" method="GET">
     <input class="btn btn-primary" type="submit" value="View" />
   </form>
-
 </div>
+{% empty %}
+<p>You haven't created any course yet.</p>
 {% endfor %}
 {% endblock body %}
