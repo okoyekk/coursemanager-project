@@ -27,3 +27,11 @@ form {
     padding: 5px;
     display: inline;
 }
+
+.course-section {
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 5px;
+    max-width: 600px;
+    margin: 5px;
+}

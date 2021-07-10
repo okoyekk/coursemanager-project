@@ -2,35 +2,69 @@
 
 {% block body %}
 <h1>{{course.name}}</h1>
-{% if user.is_student %}
 <h3>Announcements</h3>
-<h4>View announcements</h4>
-<h3>Assignments</h3>
-<h4>View Assignments</h4>
-<h3>Submissions</h3>
-<h4>View Assignent submissions</h4>
-{% endif %}
-
 {% if user.is_instructor %}
-<h3>Announcements</h3>
-<h4>Create announcement</h4>
 <form class="button-form" action="{% url 'create-announcement' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="Create an Announcement" />
 </form>
+{% endif %}
+<div class="course-section">
+    <!-- Show first 3 announcements and a link to view all announcements -->
+    {% for announcement in announcements|slice:3 %}
+    <p>{{announcement}}</p>
+    {% empty %}
+    No announcement has been made in this class yet
+    {% endfor %}
+    {% if announcements|length > 3 %}
+    <!-- todo -->
+    <p>View all {{announcements|length}} announcements</p>
+    {% endif %}
+</div>
 <h3>Assignments</h3>
-<h4>Create assignment</h4>
+{% if user.is_instructor %}
 <form class="button-form" action="{% url 'create-assignment' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="Create an Assignment" />
 </form>
+{% endif %}
+<div class="course-section">
+    <!-- Show first 3 assignments and a link to view and submit all assignments -->
+    {% for assignment in assignments|slice:3 %}
+    <p>{{assignment}}</p>
+    {% if user.is_student %}
+    <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
+        method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="Submit" />
+    </form>
+    {% else %}
+    <form class="button-form" action="#" method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
+    </form>
+    {% endif %}
+    {% empty %}
+    No assignment has been made for this class yet
+    {% endfor %}
+    {% if assignments|length > 3 %}
+    <!-- todo -->
+    <p>View all {{assignments|length}} assignments</p>
+    {% endif %}
+</div>
+{% if user.is_instructor %}
 <h3>My Students</h3>
-<h4>Take Attendance</h4>
 <form class="button-form" action="{% url 'create-attendance' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="Take Attendance" />
 </form>
-<h4>Grade Assignments</h4>
-<h5>Give final grades and deactivate course</h5>
-<h5>Delete course</h5>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="View Attendance" />
+</form>
 {% endif %}
 
+<h3>Grades</h3>
+{% if user.is_instructor %}
+<p>Grade Assignments</p>
+<p>Give final grades and deactivate course</p>
+<p>Delete course</p>
+{% else %}
+<p>View Final Grades</p>
+{% endif %}
 
 {% endblock body %}

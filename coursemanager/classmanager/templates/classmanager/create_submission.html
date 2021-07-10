@@ -1,5 +1,10 @@
 {% extends "classmanager/layout.html" %}
 
 {% block body %}
-  <h1>Heading</h1>
+  <h1>Create a submission for "{{assignment.title}}" in "{{course.name}}"</h1>
+  <form action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}" method="post">
+    {% csrf_token %}
+    {{submission_form.as_p}}
+    <button class="btn btn-outline-primary" type="submit">Submit Assignment</button>
+  </form>
 {% endblock body %}

@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm, AnnouncementCreationForm,\
+from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm, AnnouncementCreationForm, \
     AssignmentCreationForm, SubmissionForm
 from .models import User, Student, Instructor, Course, Enrollment, Announcement, Assignment, Submission, Attendance
 
@@ -221,6 +221,7 @@ def view_course(request, course_id):
         return render(request, "classmanager/index.html", {
             "failure_message": "Sorry, the course you wanted does not exist or was deleted"
         })
+    # check if user has permissions
     if request.user.is_student:
         # check if student is enrolled in the course
         student = Student.objects.get(pk=request.user)
@@ -241,8 +242,12 @@ def view_course(request, course_id):
                                "to view it "
         })
     # get announcements, assignments, attendance and submissions.
+    announcements = Announcement.objects.filter(course=course).order_by("date_created")
+    assignments = Assignment.objects.filter(course=course).order_by("date_created")
     return render(request, "classmanager/view_course.html", {
-        "course": course
+        "course": course,
+        "announcements": announcements,
+        "assignments": assignments
     })
 
 
@@ -250,46 +255,88 @@ def view_course(request, course_id):
 def create_announcement(request, course_id):
     # check if user is an instructor
     context = {}
-    if not request.user.is_instructor:
-        context["failure_message"] = "Sorry, you don't have the permission to create an announcement in this course."
+    course = Course.objects.get(pk=course_id)
+    if not instructor_check(request, course, "announcement", context):
         return render(request, "classmanager/index.html", context)
-    else:
-        # check if user is the instructor of the course
-        course = Course.objects.get(pk=course_id)
-        course_instructor = course.instructor
-        instructor = Instructor.objects.get(pk=request.user)
-        # return failure message if not course instructor
-        if course_instructor != instructor:
-            context["failure_message"] = "Sorry, you don't have the permission to create an announcement in this " \
-                                         "course. "
-            return render(request, "classmanager/index.html", context)
-        context["course"] = course
+    context["course"] = course
 
-        if request.method == "POST":
-            announcement_form = AnnouncementCreationForm(request.POST)
-            if announcement_form.is_valid():
-                new_announcement = announcement_form.save(commit=False)
-                new_announcement.course = course
-                new_announcement.save()
-                context["success_message"] = "Course Created Successfully"
-            else:
-                context["failure_message"] = "Sorry, your announcement cannot be blank, please refresh, " \
-                                             "write something and submit again"
-            return render(request, "classmanager/create_announcement.html", context)
+    if request.method == "POST":
+        announcement_form = AnnouncementCreationForm(request.POST)
+        if announcement_form.is_valid():
+            new_announcement = announcement_form.save(commit=False)
+            new_announcement.course = course
+            new_announcement.save()
+            context["success_message"] = "Announcement Created Successfully"
         else:
-            announcement_form = AnnouncementCreationForm()
-            context["announcement_form"] = announcement_form
-            return render(request, "classmanager/create_announcement.html", context)
+            context["failure_message"] = "Sorry, your announcement cannot be blank, please refresh, " \
+                                         "write something and submit again"
+        return render(request, "classmanager/create_announcement.html", context)
+    else:
+        announcement_form = AnnouncementCreationForm()
+        context["announcement_form"] = announcement_form
+        return render(request, "classmanager/create_announcement.html", context)
 
 
 @login_required
 def create_assignment(request, course_id):
-    pass
+    # check if user is an instructor
+    context = {}
+    course = Course.objects.get(pk=course_id)
+    if not instructor_check(request, course, "assignment", context):
+        return render(request, "classmanager/index.html", context)
+    context["course"] = course
+    if request.method == "POST":
+        assignment_form = AssignmentCreationForm(request.POST)
+        if assignment_form.is_valid():
+            new_assignment = assignment_form.save(commit=False)
+            new_assignment.course = course
+            new_assignment.save()
+            context["success_message"] = "Assignment Created Successfully"
+        else:
+            context["failure_message"] = "Sorry, your form is not valid, please reload the page and resubmit"
+        return render(request, "classmanager/create_assignment.html", context)
+    else:
+        assignment_form = AssignmentCreationForm()
+        context["assignment_form"] = assignment_form
+        return render(request, "classmanager/create_assignment.html", context)
 
 
 @login_required
 def create_submission(request, course_id, assignment_id):
-    pass
+    context = {}
+    # check if user is a student
+    if not request.user.is_student:
+        context["failure_message"] = "Sorry, you don't have the permission to create a submission for this assignment."
+        return render(request, "classmanager/index.html", context)
+    else:
+        # check if student is enrolled in this class
+        course = Course.objects.get(pk=course_id)
+        student = Student.objects.get(pk=request.user)
+        try:
+            enrollment = Enrollment.objects.get(course=course, student=student)
+        except Enrollment.DoesNotExist:
+            # case where student is not enrolled in the class but tried to access page
+            context["failure_message"] = "Sorry, you don't have the permission to create a submission for this " \
+                                         "assignment. "
+            return render(request, "classmanager/index.html", context)
+
+    context["course"] = course
+    assignment = Assignment.objects.get(pk=assignment_id)
+    context["assignment"] = assignment
+
+    if request.method == "POST":
+        submission_form = SubmissionForm(request.POST)
+        if submission_form.is_valid():
+            new_submission = submission_form.save(commit=False)
+            new_submission.student = student
+            new_submission.assignment = assignment
+            new_submission.save()
+            context["success_message"] = "Assignment submitted successfully!"
+            return render(request, "classmanager/create_submission.html", context)
+    else:
+        submission_form = SubmissionForm()
+        context["submission_form"] = submission_form
+        return render(request, "classmanager/create_submission.html", context)
 
 
 @login_required
@@ -309,3 +356,20 @@ def contact_us(request):
 # Check if user has created a Student or Instructor account already
 def has_account(request):
     return request.user.is_student or request.user.is_instructor
+
+
+# check if user is permitted to perform an instructor action in a specific course
+def instructor_check(request, course, action, context):
+    if not request.user.is_instructor:
+        context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this course."
+        return False
+    else:
+        # check if user is the instructor of the course
+        course_instructor = course.instructor
+        instructor = Instructor.objects.get(pk=request.user)
+        # return failure message if not course instructor
+        if course_instructor != instructor:
+            context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this " \
+                                         "course. "
+            return False
+    return True
