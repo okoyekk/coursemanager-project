@@ -1,5 +1,26 @@
 {% extends "classmanager/layout.html" %}
 
 {% block body %}
-  <h1>Heading</h1>
+<h1>Take attendance for {{course.name}}</h1>
+<form action="{% url 'create-attendance' course_id=course.id %}" method="post">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="week">Select the week which you are taking attendance for:</label>
+    <select class="form-control" name="week" id="week">
+      {% for week in weeks %}
+      <option value={{week}}>{{week}}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <label for="students">Select all students that attended your class during the week:</label>
+  {% for student in students %}
+  <div class="form-check">
+    <input class="form-check-input" name="{{ student.user.id }}" type="checkbox" id="{{student.user.id}}">
+    <label class="form-check-label" for="{{student.user.id}}">
+      {{student.user}}
+    </label>
+  </div>
+  {% endfor %}
+  <button class="btn btn-outline-primary" id="submit-attendance" type="submit">Submit Attendance</button>
+</form>
 {% endblock body %}

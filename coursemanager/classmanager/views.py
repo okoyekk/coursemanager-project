@@ -352,19 +352,30 @@ def create_attendance(request, course_id):
         return render(request, "classmanager/index.html", context)
     context["course"] = course
     if request.method == "POST":
-        pass
+        attendance_form = request.POST
+        week = int(attendance_form["week"])
+        student_ids = []
+        # iterate over attendance form and check for students that were ticked ('on'). then put those in a list
+        for k, v in attendance_form.items():
+            if v == "on":
+                student_ids.append(k)
+        # create and save new attendance for each student in selected week
+        for student_id in student_ids:
+            new_attendance = Attendance(student=Student.objects.get(pk=student_id), course=course, week=week)
+            new_attendance.save()
+        return HttpResponseRedirect(reverse("index"))
     else:
         # get all students enrolled in class and put in a list
         student_keys = Enrollment.objects.filter(course=course)
-        students = []
+        student_list = []
         for key in student_keys:
-            students.append(Student.objects.get(pk=key.student))
-        if len(students) < 1:
+            student_list.append(Student.objects.get(pk=key.student))
+        if len(student_list) < 1:
             context["failure_message"] = "Sorry you cannot take an attendance for an empty class"
             return render(request, "classmanager/index.html", context)
         else:
             context["weeks"] = range(1, course.length)
-            context["students"] = students
+            context["students"] = student_list
             return render(request, "classmanager/create_attendance.html", context)
 
 
