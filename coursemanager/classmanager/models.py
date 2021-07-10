@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import date
+from datetime import date, timedelta
 
 
 # Create your models here.
@@ -63,7 +63,7 @@ class Instructor(models.Model):
 
 
 class Course(models.Model):
-    instructor = models.OneToOneField(Instructor, on_delete=models.CASCADE)
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=False, default=None)
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -85,8 +85,8 @@ class Course(models.Model):
 
 
 class Enrollment(models.Model):
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
-    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     date_joined = models.DateField(auto_now_add=True)
 
     def __str__(self):
@@ -94,7 +94,7 @@ class Enrollment(models.Model):
 
 
 class Announcement(models.Model):
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     text = models.TextField(max_length=1000, default=None)
     date_created = models.DateField(auto_now_add=True)
 
@@ -105,11 +105,12 @@ class Announcement(models.Model):
 
 class Assignment(models.Model):
     title = models.TextField(max_length=255, blank=False)
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     file_url = models.URLField(blank=True, max_length=200)
     description = models.TextField(max_length=1000, blank=True)
     date_created = models.DateField(auto_now_add=True)
-    due_date = models.DateField(blank=False)
+    # default due date would be 3 days away from today
+    due_date = models.DateField(blank=False, default=date.today() + timedelta(days=3))
     points = models.PositiveIntegerField(default=1)
 
     def __str__(self):
@@ -117,8 +118,8 @@ class Assignment(models.Model):
 
 
 class Submission(models.Model):
-    assignment = models.OneToOneField(Assignment, on_delete=models.CASCADE)
-    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(default=0)
     text = models.TextField(max_length=1000)
 
@@ -127,8 +128,8 @@ class Submission(models.Model):
 
 
 class Attendance(models.Model):
-    student = models.OneToOneField(Student, on_delete=models.CASCADE)
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     week = models.PositiveIntegerField(default=1)
 
     def __str__(self):
