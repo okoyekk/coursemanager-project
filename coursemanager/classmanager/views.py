@@ -110,6 +110,7 @@ def register_role(request, role):
                     request.user.is_student = True
                 else:
                     request.user.is_instructor = True
+                request.user.save()
         else:
             # Send user error messages based on the situation
             if not request.user.is_authenticated:
@@ -190,7 +191,10 @@ def view_joined_courses(request):
     if request.user.is_student:
         # if the user is a student, return a template with the joined courses in the context
         student = Student.objects.get(pk=request.user)
-        courses = Enrollment.objects.filter(student=student)
+        course_keys = Enrollment.objects.filter(student=student)
+        courses = []
+        for key in course_keys:
+            courses.append(Course.objects.get(pk=key.course.id))
         return render(request, "classmanager/joined_courses.html", {
             "courses": courses
         })
@@ -341,7 +345,27 @@ def create_submission(request, course_id, assignment_id):
 
 @login_required
 def create_attendance(request, course_id):
-    pass
+    # check if user is an instructor
+    context = {}
+    course = Course.objects.get(pk=course_id)
+    if not instructor_check(request, course, "assignment", context):
+        return render(request, "classmanager/index.html", context)
+    context["course"] = course
+    if request.method == "POST":
+        pass
+    else:
+        # get all students enrolled in class and put in a list
+        student_keys = Enrollment.objects.filter(course=course)
+        students = []
+        for key in student_keys:
+            students.append(Student.objects.get(pk=key.student))
+        if len(students) < 1:
+            context["failure_message"] = "Sorry you cannot take an attendance for an empty class"
+            return render(request, "classmanager/index.html", context)
+        else:
+            context["weeks"] = range(1, course.length)
+            context["students"] = students
+            return render(request, "classmanager/create_attendance.html", context)
 
 
 @login_required

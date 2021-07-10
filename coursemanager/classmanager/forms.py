@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, Textarea
 from django.utils import timezone
-from .models import Student, Instructor, Course, Announcement, Assignment, Submission, Attendance
+from .models import Student, Instructor, Course, Announcement, Assignment, Submission
 from datetime import datetime
 
 # date picker for dates between today and january 1 1920
