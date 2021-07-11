@@ -2,7 +2,7 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<h3>Welcome, {{user.first_name}} {{user.last_name}}</h3>
+<h2>Welcome, {{user.first_name}} {{user.last_name}}</h2>
 <h5>Here are some things you can do:</h5>
 <div class="operations">
   {% if user.is_instructor %}

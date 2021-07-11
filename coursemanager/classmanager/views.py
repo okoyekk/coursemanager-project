@@ -15,6 +15,7 @@ def index(request):
     return render(request, "classmanager/index.html")
 
 
+# AUTHENTICATION AND REGISTRATION VIEWS
 def login_view(request):
     login_form = AuthenticationForm()
     if request.method == "POST":
@@ -84,6 +85,7 @@ def register_user(request):
         return render(request, "classmanager/register_user.html")
 
 
+@login_required
 def register_role(request, role):
     role = role.lower()
     if request.method == "POST":
@@ -131,6 +133,17 @@ def register_role(request, role):
         })
 
 
+def forgot_password(request):
+    # todo
+    pass
+
+
+def change_name(request):
+    # todo
+    pass
+
+
+# ROLE SPECIFIC VIEWS
 @login_required
 def create_course(request):
     if request.method == "POST":
@@ -317,7 +330,7 @@ def create_submission(request, course_id, assignment_id):
         course = Course.objects.get(pk=course_id)
         student = Student.objects.get(pk=request.user)
         try:
-            enrollment = Enrollment.objects.get(course=course, student=student)
+            Enrollment.objects.get(course=course, student=student)
         except Enrollment.DoesNotExist:
             # case where student is not enrolled in the class but tried to access page
             context["failure_message"] = "Sorry, you don't have the permission to create a submission for this " \
@@ -472,17 +485,61 @@ def grade_submission(request, submission_id):
     return render(request, "classmanager/grade_submission.html", context)
 
 
+@login_required
+def leave_course(request, course_id):
+    # todo
+    pass
+
 
 @login_required
+def view_attendance(request, course_id):
+    # todo
+    pass
+
+
+@login_required
+def give_final_grades(request, course_id):
+    # todo page for grading all students, with links to a form for each one
+    pass
+
+
+@login_required
+def give_final_grade(request, course_id, student_id):
+    # todo page for grading all students, with links to a form for each one
+    pass
+
+
+@login_required
+def view_final_grade(request, course_id):
+    # todo
+    pass
+
+
+@login_required
+def deactivate_course(request, course_id):
+    # todo
+    pass
+
+
+@login_required
+def delete_course(request, course_id):
+    # todo
+    pass
+
+
+# USER INFO AND STATIC VIEWS
+@login_required
 def view_my_profile(request):
+    # todo
     pass
 
 
 def contact_us(request):
-    # TODO
+    # todo
     return render(request, "classmanager/contact_us.html")
 
 
+# HELPER FUNCTIONS
 # Check if user has created a Student or Instructor account already
 def has_account(request):
     return request.user.is_student or request.user.is_instructor

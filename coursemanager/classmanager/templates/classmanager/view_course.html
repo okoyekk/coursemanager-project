@@ -11,10 +11,12 @@
 <div class="course-section">
     <!-- Show first 3 announcements and a link to view all announcements -->
     {% for announcement in announcements|slice:3 %}
+    <hr>
     <p>{{announcement}}</p>
     {% empty %}
     No announcement has been made in this class yet
     {% endfor %}
+    <hr>
     {% if announcements|length > 3 %}
     <form class="button-form" action="{% url 'view-all' course_id=course.id activity='announcements' %}" method="GET">
         <input class="btn btn-outline-primary" type="submit" value="View all {{announcements|length}} announcements" />
@@ -53,8 +55,7 @@
     {% endif %}
     {% if user.is_student %}
     <hr>
-    <form class="button-form" action="{% url 'view-all-submissions' course_id=course.id %}"
-        method="GET">
+    <form class="button-form" action="{% url 'view-all-submissions' course_id=course.id %}" method="GET">
         <input class="btn btn-outline-primary" type="submit" value="View all Your submissions" />
     </form>
     {% endif %}
@@ -72,11 +73,25 @@
 
 <h3>Grades</h3>
 {% if user.is_instructor %}
-<p>Grade Assignments</p>
-<p>Give final grades and deactivate course</p>
-<p>Delete course</p>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-info" type="submit" value="View class final score" />
+</form>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-success" type="submit" value="Give final grades" />
+</form>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-warning" type="submit" value="Deactivate course" />
+</form>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-danger" type="submit" value="Delete course" />
+</form>
 {% else %}
-<p>View Final Grades</p>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-success" type="submit" value="View Final Grades" />
+</form>
+<form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-danger" type="submit" value="Leave course" />
+</form>
 {% endif %}
 
 {% endblock body %}

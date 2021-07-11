@@ -138,3 +138,12 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"'{self.student.get_name()}' attended {self.course.name} in week {self.week}"
+
+
+class Grade(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    score = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"'{self.student.get_name()}' scored {self.score}% in '{self.course.name}'"
