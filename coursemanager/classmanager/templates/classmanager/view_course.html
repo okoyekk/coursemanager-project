@@ -16,8 +16,9 @@
     No announcement has been made in this class yet
     {% endfor %}
     {% if announcements|length > 3 %}
-    <!-- todo -->
-    <p>View all {{announcements|length}} announcements</p>
+    <form class="button-form" action="{% url 'view-all' course_id=course.id activity='announcements' %}" method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="View all {{announcements|length}} announcements" />
+    </form>
     {% endif %}
 </div>
 <h3>Assignments</h3>
@@ -29,6 +30,7 @@
 <div class="course-section">
     <!-- Show first 3 assignments and a link to view and submit all assignments -->
     {% for assignment in assignments|slice:3 %}
+    <hr>
     <p>{{assignment}}</p>
     {% if user.is_student %}
     <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
@@ -36,7 +38,8 @@
         <input class="btn btn-outline-primary" type="submit" value="Submit" />
     </form>
     {% else %}
-    <form class="button-form" action="#" method="GET">
+    <form class="button-form" action="{% url 'view-submissions' course_id=course.id assignment_id=assignment.id%}"
+        method="GET">
         <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
     </form>
     {% endif %}
@@ -44,10 +47,19 @@
     No assignment has been made for this class yet
     {% endfor %}
     {% if assignments|length > 3 %}
-    <!-- todo -->
-    <p>View all {{assignments|length}} assignments</p>
+    <form class="button-form" action="{% url 'view-all' course_id=course.id activity='announcements' %}" method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="View all {{assignments|length}} assignments" />
+    </form>
+    {% endif %}
+    {% if user.is_student %}
+    <hr>
+    <form class="button-form" action="{% url 'view-all-submissions' course_id=course.id %}"
+        method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="View all Your submissions" />
+    </form>
     {% endif %}
 </div>
+
 {% if user.is_instructor %}
 <h3>My Students</h3>
 <form class="button-form" action="{% url 'create-attendance' course_id=course.id %}" method="GET">

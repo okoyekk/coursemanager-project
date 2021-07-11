@@ -125,9 +125,10 @@ class Submission(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     score = models.PositiveIntegerField(default=0)
     text = models.TextField(max_length=1000)
+    date_submitted = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Submission for '{self.assignment.title}' by '{self.student.get_name()}"
+        return f"Submission for '{self.assignment.title}' by '{self.student.get_name()}' on {self.date_submitted}"
 
 
 class Attendance(models.Model):

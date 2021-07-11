@@ -207,7 +207,7 @@ def view_joined_courses(request):
 def view_created_courses(request):
     if request.user.is_instructor:
         instructor = Instructor.objects.get(pk=request.user)
-        courses = Course.objects.filter(instructor=instructor).order_by("date_created")
+        courses = Course.objects.filter(instructor=instructor).order_by("-date_created")
         return render(request, "classmanager/created_courses.html", {
             "courses": courses
         })
@@ -246,8 +246,8 @@ def view_course(request, course_id):
                                "to view it "
         })
     # get announcements, assignments, attendance and submissions.
-    announcements = Announcement.objects.filter(course=course).order_by("date_created")
-    assignments = Assignment.objects.filter(course=course).order_by("date_created")
+    announcements = Announcement.objects.filter(course=course).order_by("-date_created")
+    assignments = Assignment.objects.filter(course=course).order_by("-date_created")
     return render(request, "classmanager/view_course.html", {
         "course": course,
         "announcements": announcements,
@@ -347,9 +347,9 @@ def create_submission(request, course_id, assignment_id):
 def create_attendance(request, course_id):
     # check if user is an instructor
     context = {}
-    course = Course.objects.get(pk=course_id)
-    if not instructor_check(request, course, "assignment", context):
+    if not instructor_check(request, course_id, "assignment", context):
         return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
     context["course"] = course
     if request.method == "POST":
         attendance_form = request.POST
@@ -380,11 +380,106 @@ def create_attendance(request, course_id):
 
 
 @login_required
+def view_all(request, activity, course_id):
+    # check if course is valid
+    try:
+        course = Course.objects.get(pk=course_id)
+    except Course.DoesNotExist:
+        return render(request, "classmanager/index.html", {
+            "failure_message": "Sorry, the course you wanted does not exist or was deleted"
+        })
+    context = {"course": course}
+    if activity == "announcements":
+        announcements = Announcement.objects.filter(course=course).order_by("-date_created")
+        context["announcements"] = announcements
+        return render(request, "classmanager/view_announcements.html", context)
+    elif activity == "assignments":
+        assignments = Assignment.objects.filter(course=course).order_by("-date_created")
+        context["assignments"] = assignments
+        return render(request, "classmanager/view_assignments.html", context)
+    else:
+        return render(request, "classmanager/index.html", {
+            "failure_message": "Sorry, the activity you tried to access does not exist"
+        })
+
+
+@login_required
+def view_submissions(request, course_id, assignment_id):
+    # *instructor only route* (to view all submissions of a specific assignment)
+    # check if user is an instructor
+    context = {}
+    if not instructor_check(request, course_id, "assignment", context):
+        return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
+    context["course"] = course
+    # get assignment record
+    try:
+        assignment = Assignment.objects.get(pk=assignment_id)
+    except Assignment.DoesNotExist:
+        context["failure_message"] = "The Assignment you are searching for does not exist"
+        return render(request, "classmanager/index.html", context)
+    else:
+        context["assignment"] = assignment
+        # get submissions for assignment
+        submissions = Submission.objects.filter(assignment=assignment)
+        context["submissions"] = submissions
+        return render(request, "classmanager/view_submissions.html", context)
+
+
+@login_required
+def view_all_submissions(request, course_id):
+    # *student only route* (to view all their submissions in a course)
+    context = {}
+    if not request.user.is_student:
+        context["failure_message"] = "Sorry you cannot access this page"
+        return render(request, "classmanager/index.html", context)
+    try:
+        # search for all submissions made by student in that course
+        course = Course.objects.get(pk=course_id)
+        student = Student.objects.get(pk=request.user)
+        submissions = Submission.objects.filter(assignment__course=course, student=student).order_by("-date_submitted")
+    except Course.DoesNotExist or Student.DoesNotExist:
+        context["failure_message"] = "Sorry but records do not exist for this student/course"
+        return render(request, "classmanager/index.html", context)
+    else:
+        context["course"] = course
+        context["student"] = student
+        context["submissions"] = submissions
+        return render(request, "classmanager/view_all_submissions.html", context)
+
+
+@login_required
+def grade_submission(request, submission_id):
+    context = {}
+    # check if submission is valid
+    try:
+        submission = Submission.objects.get(pk=submission_id)
+        course = Course.objects.get(pk=submission.assignment.course.id)
+    except Submission.DoesNotExist:
+        context["failure_message"] = "The Submission you are trying to grade for does not exist"
+        return render(request, "classmanager/index.html", context)
+    # check if user is an instructor
+    if not instructor_check(request, course.id, "assignment", context):
+        return render(request, "classmanager/index.html", context)
+
+    context["submission"] = submission
+    context["course"] = course
+    if request.method == "POST":
+        score = request.POST["score"]
+        submission.score = score
+        submission.save()
+        context["success_message"] = "Score updated successfully!"
+    return render(request, "classmanager/grade_submission.html", context)
+
+
+
+@login_required
 def view_my_profile(request):
     pass
 
 
 def contact_us(request):
+    # TODO
     return render(request, "classmanager/contact_us.html")
 
 
@@ -394,17 +489,25 @@ def has_account(request):
 
 
 # check if user is permitted to perform an instructor action in a specific course
-def instructor_check(request, course, action, context):
-    if not request.user.is_instructor:
-        context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this course."
+def instructor_check(request, course_id, action, context):
+    # check if course is valid
+    try:
+        course = Course.objects.get(pk=course_id)
+    except Course.DoesNotExist:
+        context["failure_message"] = "The course you are searching for does not exist"
         return False
     else:
-        # check if user is the instructor of the course
-        course_instructor = course.instructor
-        instructor = Instructor.objects.get(pk=request.user)
-        # return failure message if not course instructor
-        if course_instructor != instructor:
-            context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this " \
-                                         "course. "
+        # check if user is an instructor
+        if not request.user.is_instructor:
+            context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this course."
             return False
-    return True
+        else:
+            # check if instructor is the instructor of the course
+            course_instructor = course.instructor
+            instructor = Instructor.objects.get(pk=request.user)
+            # return failure message if not course instructor
+            if course_instructor != instructor:
+                context["failure_message"] = f"Sorry, you don't have the permission to create an {action} in this " \
+                                             "course. "
+                return False
+        return True

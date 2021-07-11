@@ -1,0 +1,22 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>All Assignments in {{course.name}}</h1>
+<div class="course-section">
+  {% for assignment in assignments|slice:3 %}
+  <p>{{assignment}}</p>
+  {% if user.is_student %}
+  <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
+    method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Submit" />
+  </form>
+  {% else %}
+  <form class="button-form" action="#" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
+  </form>
+  {% endif %}
+  {% empty %}
+  No assignment has been made for this class yet
+  {% endfor %}
+</div>
+{% endblock body %}

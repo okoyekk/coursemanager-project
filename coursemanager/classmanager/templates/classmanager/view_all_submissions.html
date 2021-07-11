@@ -1,0 +1,15 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>All your submissions in "{{course.name}}"</h1>
+<div class="course-section">
+  {% for submission in submissions %}
+  <p>{{submission}}</p>
+  <p>{{submission.assignment.title}}</p>
+  <p>Answer: {{submission.text}}</p>
+  <p>Current Score: {{submission.score}}/{{submission.assignment.points}}</p>
+  {% empty %}
+  You have not yet submitted anything in this class.
+  {% endfor %}
+</div>
+{% endblock body %}

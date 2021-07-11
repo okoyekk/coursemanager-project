@@ -19,6 +19,10 @@ urlpatterns = [
     path("create/assignment/<int:course_id>", views.create_assignment, name="create-assignment"),
     path("create/submission/<int:course_id>/<int:assignment_id>", views.create_submission, name="create-submission"),
     path("create/attendance/<int:course_id>", views.create_attendance, name="create-attendance"),
+    path("view/all/<str:activity>/<int:course_id>", views.view_all, name="view-all"),
+    path("view/submissions/<int:course_id>/<int:assignment_id>", views.view_submissions, name="view-submissions"),
+    path("view/submissions/<int:course_id>", views.view_all_submissions, name="view-all-submissions"),
+    path("grade/submission/<int:submission_id>", views.grade_submission, name="grade-submission"),
     path("view/my_profile", views.view_my_profile, name="view-my-profile"),
     path("contact_us", views.contact_us, name="contact_us")
 ]
