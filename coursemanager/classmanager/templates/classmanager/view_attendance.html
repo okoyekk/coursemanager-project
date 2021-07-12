@@ -1,0 +1,16 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>Weekly Attendance for {{course.name}}</h1>
+<div class="course-section">
+  {% for week, attendances in attendance_dict.items %}
+  <h5>Week {{week}}</h5>
+  {% for attendance in attendances %}
+  <p>{{attendance}}</p>
+  {% endfor %}
+  <hr>
+  {% empty %}
+  <p>No attendance has been taken in this class yet</p>
+  {% endfor %}
+</div>
+{% endblock body %}

@@ -3,7 +3,6 @@
 {% block body %}
 <h1>Join a course</h1>
 {% if user.is_student and course %}
-<!-- Check if user is a student and the course exists -->
 <h4>Do you want to join "{{course.name}}" taught by {{course.instructor.user.first_name}}
   {{course.instructor.user.last_name}}?</h4>
 <div class="join-course-buttons">

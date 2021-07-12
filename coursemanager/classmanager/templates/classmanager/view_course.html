@@ -14,7 +14,7 @@
     <hr>
     <p>{{announcement}}</p>
     {% empty %}
-    No announcement has been made in this class yet
+    <p>No announcement has been made in this class yet</p>
     {% endfor %}
     <hr>
     {% if announcements|length > 3 %}
@@ -66,7 +66,7 @@
 <form class="button-form" action="{% url 'create-attendance' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="Take Attendance" />
 </form>
-<form class="button-form" action="#" method="GET">
+<form class="button-form" action="{% url 'view-attendance' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-primary" type="submit" value="View Attendance" />
 </form>
 {% endif %}
@@ -89,7 +89,7 @@
 <form class="button-form" action="#" method="GET">
     <input class="btn btn-outline-success" type="submit" value="View Final Grades" />
 </form>
-<form class="button-form" action="#" method="GET">
+<form class="button-form" action="{% url 'leave-course' course_id=course.id %}" method="GET">
     <input class="btn btn-outline-danger" type="submit" value="Leave course" />
 </form>
 {% endif %}

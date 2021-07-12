@@ -1,0 +1,19 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>Leave {{course.name}}?</h1>
+{% if user.is_student and course %}
+<h4>Do you want to leave "{{course.name}}"?</h4>
+<div class="leave-course-buttons">
+  <p>This action is irreversible!</p>
+  <form class="button-form" action="{% url 'leave-course' course_id=course.id %}" method="POST">
+    {% csrf_token %}
+    <input class="btn btn-danger" type="submit" value="Yes" />
+  </form>
+  <form class="button-form" action="{% url 'view-joined-courses' %}" method="GET">
+    <input class="btn btn-primary" type="submit" value="No" />
+  </form>
+</div>
+{% endif %}
+
+{% endblock body %}
