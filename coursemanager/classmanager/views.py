@@ -529,33 +529,100 @@ def grade_submission(request, submission_id):
 
 
 @login_required
-def give_final_grades(request, course_id):
-    # todo page for grading all students, with links to a form for each one
-    pass
+def grade_finals(request, course_id):
+    # check if user is an instructor
+    context = {}
+    if not instructor_check(request, course_id, "give final grades", context):
+        return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
+    context["course"] = course
+    # get all students enrolled in the course and return template
+    enrollments = Enrollment.objects.filter(course=course)
+    context["enrollments"] = enrollments
+    return render(request, "classmanager/grade_finals.html", context)
 
 
 @login_required
-def give_final_grade(request, course_id, student_id):
-    # todo page for grading all students, with links to a form for each one
-    pass
+def grade_final(request, course_id, user_id):
+    # check if user is an instructor
+    context = {}
+    if not instructor_check(request, course_id, "give final grades", context):
+        return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
+    context["course"] = course
+    student = Student.objects.get(user=User.objects.get(pk=user_id))
+    context["student"] = student
+    if request.method == "POST":
+        # check if grade already exists, if it does, update it, else create one.
+        score = request.POST["score"]
+        try:
+            grade = Grade.objects.get(course=course, student=student)
+        except Grade.DoesNotExist:
+            new_grade = Grade(student=student, course=course, score=score)
+            new_grade.save()
+            context["success_message"] = "Grade has been created for student"
+            # increase student's standing
+            student.credits += course.credits
+            student.save()
+        else:
+            grade.score = score
+            grade.save()
+            context["success_message"] = "Grade has been updated for student"
+    else:
+        attendance = len(Attendance.objects.filter(student=student, course=course))
+        context["attendance"] = attendance
+    return render(request, "classmanager/grade_final.html", context)
 
 
 @login_required
-def view_final_grade(request, course_id):
-    # todo
-    pass
+def view_finals(request, course_id):
+    context = {}
+    # check if user is valid for this operation
+    if request.user.is_instructor:
+        if not instructor_check(request, course_id, "view final scores", context):
+            return render(request, "classmanager/index.html", context)
+    else:
+        if not student_check(request, course_id, "view final scores", context):
+            return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
+    if request.user.is_instructor:
+        grades = Grade.objects.filter(course=course)
+        context["grades"] = grades
+    else:
+        user = User.objects.get(pk=request.user.id)
+        student = Student.objects.get(user=user)
+        grade = Grade.objects.get(course=course, student=student)
+        context["grade"] = grade
+    context["course"] = course
+    return render(request, "classmanager/view_finals.html", context)
 
 
 @login_required
 def deactivate_course(request, course_id):
-    # todo
-    pass
+    # check if user is an instructor
+    context = {}
+    if not instructor_check(request, course_id, "deactivate a course", context):
+        return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
+    context["course"] = course
+    # deactivate the course if active or send message to user if already deactivated
+    if request.method == "POST":
+        if not course.is_active:
+            context["failure_message"] = "Course is already deactivated"
+        else:
+            course.is_active = False
+            course.save()
+            context["success_message"] = "Course successfully deactivated"
+    return render(request, "classmanager/deactivate_course.html", context)
 
 
 @login_required
 def delete_course(request, course_id):
-    # todo
-    pass
+    # check if user is an instructor
+    context = {}
+    if not instructor_check(request, course_id, "delete a course", context):
+        return render(request, "classmanager/index.html", context)
+    course = Course.objects.get(pk=course_id)
 
 
 # USER INFO AND STATIC VIEWS

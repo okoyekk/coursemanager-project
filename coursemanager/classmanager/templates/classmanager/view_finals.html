@@ -1,0 +1,23 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>Final Grades for {{course.name}}</h1>
+{% if user.is_instructor %}
+<div class="course-table">
+  {% for grade in grades %}
+  <p>{{grade}}</p>
+  {% empty %}
+  <p> No grade has been created in this class yet</p>
+  {% endfor %}
+</div>
+{% else %}
+<div class="course-section">
+  {% if grade %}
+  <h5>Your grade for {{course.name}} is {{grade.score}}/100!</h5>
+  {% else %}
+  <h5>You do not have a grade yet!</h5>
+  {% endif %}
+
+</div>
+{% endif %}
+{% endblock body %}

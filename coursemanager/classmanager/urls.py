@@ -25,6 +25,10 @@ urlpatterns = [
     path("view/submissions/<int:course_id>/<int:assignment_id>", views.view_submissions, name="view-submissions"),
     path("view/submissions/<int:course_id>", views.view_all_submissions, name="view-all-submissions"),
     path("grade/submission/<int:submission_id>", views.grade_submission, name="grade-submission"),
+    path("deactivate/course/<int:course_id>", views.deactivate_course, name="deactivate-course"),
+    path("grade/final/<int:course_id>", views.grade_finals, name="grade-finals"),
+    path("grade/final/<int:course_id>/<int:user_id>", views.grade_final, name="grade-final"),
+    path("view/final/<int:course_id>", views.view_finals, name="view-finals"),
     path("view/my_profile", views.view_my_profile, name="view-my-profile"),
     path("contact_us", views.contact_us, name="contact_us")
 ]

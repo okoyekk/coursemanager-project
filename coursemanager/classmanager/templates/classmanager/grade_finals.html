@@ -1,0 +1,16 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>Give final grades for {{course.name}}</h1>
+<div class="course-section">
+  {% for enrollment in enrollments %}
+  <hr>
+  <p>{{enrollment.student.user}}</p>
+  <form class="button-form" action="{% url 'grade-final' course_id=course.id user_id=enrollment.student.user.id %}" method="GET">
+    <input class="btn btn-outline-primary" type="submit" value="Grade Student" />
+  </form>
+  {% empty %}
+  <p>There is no student to grade yet</p>
+  {% endfor %}
+</div>
+{% endblock body %}
