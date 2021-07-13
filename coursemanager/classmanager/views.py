@@ -44,9 +44,9 @@ def login_view(request):
 @login_required
 def logout_view(request):
     # Logs out user if authenticated
-    # TODO make a message appear on index to say user just logged out
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    context = {"success_message": "Successfully logged out"}
+    return render(request, "classmanager/index.html", context)
 
 
 def register(request):
@@ -188,7 +188,7 @@ def create_course(request):
         else:
             context["failure_message"] = "Your form is either not valid or you do not have permission " \
                                          "to create a new course!"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     else:
         course_form = CourseCreationForm()
         return render(request, "classmanager/create_course.html", {
@@ -209,7 +209,7 @@ def join_course(request, course_id):
     context = {}
     # check if student is permitted
     if not (student_check(request, course_id, "join a course", context)):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     if request.method == "POST":
         course = Course.objects.get(pk=course_id)
         student = Student.objects.get(pk=request.user)
@@ -233,19 +233,19 @@ def leave_course(request, course_id):
     context = {}
     # check if student is permitted
     if not (student_check(request, course_id, "leave a course", context)):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
 
     course = Course.objects.get(pk=course_id)
     student = Student.objects.get(pk=request.user)
     # check if user is  enrolled in that specific course
     if len(Enrollment.objects.filter(course=course, student=student)) != 1:
         context["failure_message"] = "Sorry, you are not enrolled in this course so you can't leave"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
 
     # check if course is active
     if not course.is_active:
         context["failure_message"] = "Sorry, you cannot leave a course that has ended"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     context["course"] = course
     if request.method == "POST":
         # delete all records related to this user in the course
@@ -292,7 +292,7 @@ def view_course(request, course_id):
     try:
         course = Course.objects.get(pk=course_id)
     except Course.DoesNotExist:
-        return render(request, "classmanager/index.html", {
+        return render(request, "classmanager/failure.html", {
             "failure_message": "Sorry, the course you wanted does not exist or was deleted"
         })
     # check if user has permissions
@@ -300,18 +300,18 @@ def view_course(request, course_id):
         # check if student is enrolled in the course
         student = Student.objects.get(pk=request.user)
         if len(Enrollment.objects.filter(course=course_id, student=student)) == 0:
-            return render(request, "classmanager/index.html", {
+            return render(request, "classmanager/failure.html", {
                 "failure_message": "Sorry, you need to join a course in order to view it"
             })
     elif request.user.is_instructor:
         # check if instructor is the creator of the course
         instructor = Instructor.objects.get(pk=request.user)
         if course.instructor != instructor:
-            return render(request, "classmanager/index.html", {
+            return render(request, "classmanager/failure.html", {
                 "failure_message": "Sorry, you need to create a course in order to view it"
             })
     else:
-        return render(request, "classmanager/index.html", {
+        return render(request, "classmanager/failure.html", {
             "failure_message": "Sorry, you need to join a course as a student or create it as an instructor in order "
                                "to view it "
         })
@@ -331,7 +331,7 @@ def create_announcement(request, course_id):
     context = {}
     course = Course.objects.get(pk=course_id)
     if not instructor_check(request, course, "create an announcement", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     context["course"] = course
 
     if request.method == "POST":
@@ -357,7 +357,7 @@ def create_assignment(request, course_id):
     context = {}
     course = Course.objects.get(pk=course_id)
     if not instructor_check(request, course, "create an assignment", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     context["course"] = course
     if request.method == "POST":
         assignment_form = AssignmentCreationForm(request.POST)
@@ -380,7 +380,7 @@ def create_submission(request, course_id, assignment_id):
     context = {}
     # check if user is a student
     if not student_check(request, course_id, "create a submission", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
 
     course = Course.objects.get(pk=course_id)
     context["course"] = course
@@ -407,7 +407,7 @@ def create_attendance(request, course_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "create an attendance", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     context["course"] = course
     if request.method == "POST":
@@ -435,7 +435,7 @@ def create_attendance(request, course_id):
             student_list.append(Student.objects.get(pk=key.student))
         if len(student_list) < 1:
             context["failure_message"] = "Sorry you cannot take an attendance for an empty class"
-            return render(request, "classmanager/index.html", context)
+            return render(request, "classmanager/failure.html", context)
         else:
             context["weeks"] = range(1, course.length)
             context["students"] = student_list
@@ -468,10 +468,10 @@ def view_all(request, activity, course_id):
     # check if user is an instructor or student with permissions
     if request.user.is_student:
         if not (student_check(request, course_id, f"view {activity}", context)):
-            return render(request, "classmanager/index.html", context)
+            return render(request, "classmanager/failure.html", context)
     elif request.user.is_instructor:
         if not (instructor_check(request, course_id, f"view {activity}", context)):
-            return render(request, "classmanager/index.html", context)
+            return render(request, "classmanager/failure.html", context)
 
     course = Course.objects.get(pk=course_id)
     context["course"] = course
@@ -484,7 +484,7 @@ def view_all(request, activity, course_id):
         context["assignments"] = assignments
         return render(request, "classmanager/view_assignments.html", context)
     else:
-        return render(request, "classmanager/index.html", {
+        return render(request, "classmanager/failure.html", {
             "failure_message": "Sorry, the activity you tried to access does not exist"
         })
 
@@ -495,7 +495,7 @@ def view_submissions(request, course_id, assignment_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "view all submissions", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     context["course"] = course
     # get assignment record
@@ -503,7 +503,7 @@ def view_submissions(request, course_id, assignment_id):
         assignment = Assignment.objects.get(pk=assignment_id)
     except Assignment.DoesNotExist:
         context["failure_message"] = "The Assignment you are searching for does not exist"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     else:
         context["assignment"] = assignment
         # get submissions for assignment
@@ -518,7 +518,7 @@ def view_all_submissions(request, course_id):
     context = {}
     if not request.user.is_student:
         context["failure_message"] = "Sorry you cannot access this page"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     try:
         # search for all submissions made by student in that course
         course = Course.objects.get(pk=course_id)
@@ -526,7 +526,7 @@ def view_all_submissions(request, course_id):
         submissions = Submission.objects.filter(assignment__course=course, student=student).order_by("-date_submitted")
     except Course.DoesNotExist or Student.DoesNotExist:
         context["failure_message"] = "Sorry but records do not exist for this student/course"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     else:
         context["course"] = course
         context["student"] = student
@@ -543,10 +543,10 @@ def grade_submission(request, submission_id):
         course = Course.objects.get(pk=submission.assignment.course.id)
     except Submission.DoesNotExist:
         context["failure_message"] = "The Submission you are trying to grade for does not exist"
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     # check if user is an instructor
     if not instructor_check(request, course.id, "grade a submission", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
 
     context["submission"] = submission
     context["course"] = course
@@ -563,7 +563,7 @@ def grade_finals(request, course_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "give final grades", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     context["course"] = course
     # get all students enrolled in the course and return template
@@ -577,7 +577,7 @@ def grade_final(request, course_id, user_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "give final grades", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     context["course"] = course
     student = Student.objects.get(user=User.objects.get(pk=user_id))
@@ -610,10 +610,10 @@ def view_finals(request, course_id):
     # check if user is valid for this operation
     if request.user.is_instructor:
         if not instructor_check(request, course_id, "view final scores", context):
-            return render(request, "classmanager/index.html", context)
+            return render(request, "classmanager/failure.html", context)
     else:
         if not student_check(request, course_id, "view final scores", context):
-            return render(request, "classmanager/index.html", context)
+            return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     if request.user.is_instructor:
         grades = Grade.objects.filter(course=course)
@@ -632,7 +632,7 @@ def deactivate_course(request, course_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "deactivate a course", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
     context["course"] = course
     # deactivate the course if active or send message to user if already deactivated
@@ -651,8 +651,11 @@ def delete_course(request, course_id):
     # check if user is an instructor
     context = {}
     if not instructor_check(request, course_id, "delete a course", context):
-        return render(request, "classmanager/index.html", context)
+        return render(request, "classmanager/failure.html", context)
     course = Course.objects.get(pk=course_id)
+    course.delete()
+    context["success_message"] = "Course successfully deleted"
+    return render(request, "classmanager/index.html", context)
 
 
 # USER INFO AND STATIC VIEWS
