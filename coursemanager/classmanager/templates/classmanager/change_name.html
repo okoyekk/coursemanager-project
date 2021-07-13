@@ -1,0 +1,15 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>Change name</h1>
+<form action="{% url 'change-name' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <input class="form-control" type="text" value="{{first_name}}" name="first-name" placeholder="First Name">
+    </div>
+    <div class="form-group">
+        <input class="form-control" type="text" value="{{last_name}}" name="last-name" placeholder="Last Name">
+    </div>
+    <button class="btn btn-outline-primary" id="submit-user" type="submit">Change Name</button>
+</form>
+{% endblock body %}

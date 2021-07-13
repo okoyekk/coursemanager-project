@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("accounts/login/", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
+    path("forgot_password", views.forgot_password, name="forgot-password"),
     path("register", views.register, name="register"),
     path("register/user", views.register_user, name="register-user"),
     path("register/<str:role>", views.register_role, name="register-role"),
@@ -30,5 +31,6 @@ urlpatterns = [
     path("grade/final/<int:course_id>/<int:user_id>", views.grade_final, name="grade-final"),
     path("view/final/<int:course_id>", views.view_finals, name="view-finals"),
     path("view/my_profile", views.view_my_profile, name="view-my-profile"),
+    path("change/name", views.change_name, name="change-name"),
     path("contact_us", views.contact_us, name="contact_us")
 ]

@@ -1,0 +1,25 @@
+{% extends "classmanager/layout.html" %}
+
+{% block body %}
+<h1>My Profile</h1>
+<p>Name: {{user}}</p>
+{% if user.is_student %}
+<p>Date of birth: {{student.date_of_birth}}</p>
+<p>Major: {{student.major}}</p>
+<p>Standing: {{student.standing}}</p>
+<p>Credits completed: {{student.credits}}</p>
+{% else %}
+  {% if user.is_instructor %}
+    <p>Date of birth: {{instructor.date_of_birth}}</p>
+    <p>Courses taught: {{courses}}</p>
+    <p>Department: {{instructor.department}}</p>
+  {% else %}
+    <p>You are a standard user, register for a role in order to have more on your profile.</p>
+  {% endif %}
+
+{% endif %}
+
+<form class="button-form" action="{% url 'change-name' %}" method="GET">
+  <input class="btn btn-outline-primary" type="submit" value="Change my name" />
+</form>
+{% endblock body %}

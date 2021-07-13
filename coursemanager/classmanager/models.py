@@ -8,11 +8,8 @@ class User(AbstractUser):
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
 
-    def get_name(self):
-        return f"{self.first_name} {self.last_name}"
-
     def __str__(self):
-        return self.get_name()
+        return self.get_full_name()
 
 
 # Student model that is also a user
@@ -42,7 +39,7 @@ class Student(models.Model):
                f"Email: {self.user.email}."
 
     def get_name(self):
-        return self.user.get_name()
+        return str(self.user)
 
 
 # Instructor model that is also a user
@@ -62,7 +59,7 @@ class Instructor(models.Model):
                f" Department: {self.department}, Email: {self.user.email}."
 
     def get_name(self):
-        return self.user.get_name()
+        return str(self.user)
 
 
 class Course(models.Model):

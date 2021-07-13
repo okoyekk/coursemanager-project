@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm,\
+from .forms import StudentRegisterForm, InstructorRegisterForm, CourseCreationForm, \
     AnnouncementCreationForm, AssignmentCreationForm, SubmissionForm
 from .models import User, Student, Instructor, Course, Enrollment, \
     Announcement, Assignment, Submission, Attendance, Grade
@@ -135,13 +135,43 @@ def register_role(request, role):
 
 
 def forgot_password(request):
-    # todo
-    pass
+    if request.method == "POST":
+        context = {}
+        email, username = request.POST["email"], request.POST["username"]
+        password, confirmation = request.POST["password"], request.POST["confirmation"]
+        # check if new password and confirmation are the same
+        if password != confirmation:
+            context["failure_message"] = "Your passwords do not match, please fic that and resubmit"
+            return render(request, "classmanager/forgot_password.html", context)
+        else:
+            # check if user exists
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                context["failure_message"] = "Please enter a valid username/email combination and resubmit"
+            else:
+                if user.email != email:
+                    context["failure_message"] = "Please enter a valid username/email combination and resubmit"
+                else:
+                    user.set_password(password)
+                    user.save()
+                    context["success_message"] = "Password changed successfully!"
+            return render(request, "classmanager/forgot_password.html", context)
+    else:
+        return render(request, "classmanager/forgot_password.html")
 
 
+@login_required
 def change_name(request):
-    # todo
-    pass
+    context = {"first_name": request.user.first_name, "last_name": request.user.last_name}
+    if request.method == "POST":
+        request.user.first_name = request.POST["first-name"]
+        request.user.last_name = request.POST["last-name"]
+        request.user.save()
+        context = {"first_name": request.user.first_name, "last_name": request.user.last_name}
+        return render(request, "classmanager/change_name.html", context)
+    else:
+        return render(request, "classmanager/change_name.html", context)
 
 
 # ROLE SPECIFIC VIEWS
@@ -628,12 +658,17 @@ def delete_course(request, course_id):
 # USER INFO AND STATIC VIEWS
 @login_required
 def view_my_profile(request):
-    # todo
-    pass
+    context = {}
+    if request.user.is_student:
+        context["student"] = Student.objects.get(user=request.user)
+    elif request.user.is_instructor:
+        instructor = Instructor.objects.get(user=request.user)
+        context["instructor"] = instructor
+        context["courses"] = len(Course.objects.filter(instructor=instructor))
+    return render(request, "classmanager/view_profile.html", context)
 
 
 def contact_us(request):
-    # todo
     return render(request, "classmanager/contact_us.html")
 
 
