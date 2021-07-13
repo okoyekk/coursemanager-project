@@ -185,10 +185,11 @@ def create_course(request):
             new_course.instructor = Instructor.objects.get(pk=request.user)
             new_course.save()
             context["success_message"] = "Course Created Successfully"
+            return render(request, "classmanager/index.html", context)
         else:
             context["failure_message"] = "Your form is either not valid or you do not have permission " \
                                          "to create a new course!"
-        return render(request, "classmanager/failure.html", context)
+            return render(request, "classmanager/failure.html", context)
     else:
         course_form = CourseCreationForm()
         return render(request, "classmanager/create_course.html", {
@@ -330,7 +331,7 @@ def create_announcement(request, course_id):
     # check if user is an instructor
     context = {}
     course = Course.objects.get(pk=course_id)
-    if not instructor_check(request, course, "create an announcement", context):
+    if not instructor_check(request, course_id, "create an announcement", context):
         return render(request, "classmanager/failure.html", context)
     context["course"] = course
 
@@ -356,7 +357,7 @@ def create_assignment(request, course_id):
     # check if user is an instructor
     context = {}
     course = Course.objects.get(pk=course_id)
-    if not instructor_check(request, course, "create an assignment", context):
+    if not instructor_check(request, course_id, "create an assignment", context):
         return render(request, "classmanager/failure.html", context)
     context["course"] = course
     if request.method == "POST":

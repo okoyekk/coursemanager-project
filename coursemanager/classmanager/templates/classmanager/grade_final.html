@@ -3,13 +3,19 @@
 {% block body %}
 <h1>Grade final for "{{student.user}}" in "{{course.name}}" </h1>
 <div class="course-section">
-  <p>{{student.user}}</p>
-  <p>Attendance: {{attendance}}/{{course.length}}</p>
-  <form class="button-form" action="{% url 'grade-final' course_id=course.id user_id=student.user.id %}" method="POST">
-    {% csrf_token %}
-    <label for="score">Enter a score for student (between 0 and 100):</label>
-    <input type="number" id="score" name="score" default="0" min="0" max="100"><br>
-    <input class="btn btn-outline-primary" type="submit" value="Grade Student" />
-  </form>
+  <div class="card">
+    <div class="card-body">
+      <p>{{student.user}}</p>
+      <p>Attendance: {{attendance}}/{{course.length}}</p>
+      <form class="button-form" action="{% url 'grade-final' course_id=course.id user_id=student.user.id %}"
+        method="POST">
+        {% csrf_token %}
+        <label for="score">Enter a score for student (between 0 and 100):</label>
+        <input class="form-control" type="number" id="score" name="score" default="0" min="0" max="100"><br>
+        <input class="btn btn-outline-primary" type="submit" value="Grade Student" />
+      </form>
+    </div>
+  </div>
+
 </div>
 {% endblock body %}

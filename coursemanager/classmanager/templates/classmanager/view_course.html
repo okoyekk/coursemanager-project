@@ -11,13 +11,23 @@
 <div class="course-section">
     <!-- Show first 3 announcements and a link to view all announcements -->
     {% for announcement in announcements|slice:3 %}
-    <hr>
-    <p>{{announcement}}</p>
+    <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+            <p class="card-text">{{announcement.text}}</p>
+        </div>
+        <div class="card-footer">
+            <p><strong>Posted on: </strong> {{announcement.date_created}}</p>
+        </div>
+    </div>
     {% empty %}
-    <p>No announcement has been made in this class yet</p>
+    <div class="card">
+        <div class="card-body">
+            no announcement has been made in this class yet.
+        </div>
+    </div>
     {% endfor %}
-    <hr>
     {% if announcements|length > 3 %}
+    <hr>
     <form class="button-form" action="{% url 'view-all' course_id=course.id activity='announcements' %}" method="GET">
         <input class="btn btn-outline-primary" type="submit" value="View all {{announcements|length}} announcements" />
     </form>
@@ -32,21 +42,34 @@
 <div class="course-section">
     <!-- Show first 3 assignments and a link to view and submit all assignments -->
     {% for assignment in assignments|slice:3 %}
-    <hr>
-    <p>{{assignment}}</p>
-    {% if user.is_student %}
-    <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
-        method="GET">
-        <input class="btn btn-outline-primary" type="submit" value="Submit" />
-    </form>
-    {% else %}
-    <form class="button-form" action="{% url 'view-submissions' course_id=course.id assignment_id=assignment.id%}"
-        method="GET">
-        <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
-    </form>
-    {% endif %}
+    <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+            <h5 class="card-title">{{assignment.title}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Due: {{assignment.due_date}}</h6>
+            <p class="card-text">
+                <strong>Description:</strong> {{assignment.description}} <br>
+                <strong>Points:</strong> {{assignment.points}} <br>
+                <strong>Url:</strong> <a href="{{assignment.file_url}}" target="_blank">Link</a> <br>
+            </p>
+            {% if user.is_student %}
+            <form class="button-form"
+                action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}" method="GET">
+                <input class="btn btn-outline-primary" type="submit" value="Submit" />
+            </form>
+            {% else %}
+            <form class="button-form"
+                action="{% url 'view-submissions' course_id=course.id assignment_id=assignment.id%}" method="GET">
+                <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
+            </form>
+            {% endif %}
+        </div>
+    </div>
     {% empty %}
-    No assignment has been made for this class yet
+    <div class="card">
+        <div class="card-body">
+            No assignment has been made in this class yet.
+        </div>
+    </div>
     {% endfor %}
     {% if assignments|length > 3 %}
     <form class="button-form" action="{% url 'view-all' course_id=course.id activity='announcements' %}" method="GET">

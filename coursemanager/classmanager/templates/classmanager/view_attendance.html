@@ -6,11 +6,18 @@
   {% for week, attendances in attendance_dict.items %}
   <h5>Week {{week}}</h5>
   {% for attendance in attendances %}
-  <p>{{attendance}}</p>
+  <div class="card">
+    <div class="card-body">
+      <p>{{attendance}}</p>
+    </div>
+  </div>
   {% endfor %}
-  <hr>
   {% empty %}
-  <p>No attendance has been taken in this class yet</p>
+  <div class="card">
+    <div class="card-body">
+      <p>No attendance has been taken in this class yet</p>
+    </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock body %}

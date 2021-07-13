@@ -1,13 +1,15 @@
 {% extends "classmanager/layout.html" %}
 
-{% block body %}
-  <h1>Login</h1>
-  <!-- User Login form -->
-  <form action="{% url 'login' %}" method="post" id="login-form">
-    {% csrf_token %}
-    {{ login_form.as_p }}
-    <button class="btn btn-outline-primary" type="submit">Login</button>
-  </form>
+{% load crispy_forms_tags %}
 
-  <a href="{% url 'forgot-password' %}">Forgot Password?</a>
+{% block body %}
+<h1>Login</h1>
+<!-- User Login form -->
+<form action="{% url 'login' %}" method="post" id="login-form">
+  {% csrf_token %}
+  {{ login_form|crispy }}
+  <button class="btn btn-outline-primary" type="submit">Login</button>
+</form>
+
+<a href="{% url 'forgot-password' %}">Forgot Password?</a>
 {% endblock body %}

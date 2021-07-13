@@ -4,9 +4,21 @@
 <h1>All Announcements in {{course.name}}</h1>
 <div class="course-section">
   {% for announcement in announcements %}
-  <p>{{announcement}}</p>
+  <div class="card" style="max-width: 400px;">
+    <div class="card-body">
+      <p class="card-text">{{announcement.text}}</p>
+    </div>
+    <div class="card-footer">
+      <p><strong>Posted on: </strong> {{announcement.date_created}}</p>
+    </div>
+  </div>
+  <p> </p>
   {% empty %}
-  <p> announcement has been made in this class yet</p>
+  <div class="card">
+    <div class="card-body">
+      No announcement has been made in this class yet.
+    </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock body %}

@@ -4,19 +4,34 @@
 <h1>All Assignments in {{course.name}}</h1>
 <div class="course-section">
   {% for assignment in assignments|slice:3 %}
-  <p>{{assignment}}</p>
-  {% if user.is_student %}
-  <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
-    method="GET">
-    <input class="btn btn-outline-primary" type="submit" value="Submit" />
-  </form>
-  {% else %}
-  <form class="button-form" action="#" method="GET">
-    <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
-  </form>
-  {% endif %}
+  <div class="card" style="max-width: 400px;">
+    <div class="card-body">
+      <h5 class="card-title">{{assignment.title}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Due: {{assignment.due_date}}</h6>
+      <p class="card-text">
+        <strong>Description:</strong> {{assignment.description}} <br>
+        <strong>Points:</strong> {{assignment.points}} <br>
+        <strong>Url:</strong> <a href="{{assignment.file_url}}" target="_blank">Link</a> <br>
+      </p>
+      {% if user.is_student %}
+      <form class="button-form" action="{% url 'create-submission' course_id=course.id assignment_id=assignment.id%}"
+        method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="Submit" />
+      </form>
+      {% else %}
+      <form class="button-form" action="{% url 'view-submissions' course_id=course.id assignment_id=assignment.id%}"
+        method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="View Submissions" />
+      </form>
+      {% endif %}
+    </div>
+  </div>
   {% empty %}
-  <p>No assignment has been made for this class yet</p>
+  <div class="card">
+    <div class="card-body">
+      No assignment has been made in this class yet.
+    </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock body %}

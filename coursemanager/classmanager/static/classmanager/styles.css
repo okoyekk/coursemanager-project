@@ -10,13 +10,6 @@
     margin-bottom: 10px;
 }
 
-.course-listing {
-    border-radius: 5px;
-    border: 1px solid black;
-    padding: 5px;
-    max-width: 600px;
-}
-
 form {
     max-width: 600px;
 }
@@ -32,10 +25,14 @@ form {
     border-radius: 5px;
     border: 1px solid black;
     padding: 5px;
-    max-width: 600px;
+    max-width: 450px;
     margin: 5px;
 }
 
 h3 {
     margin: 5px;
+}
+
+form > button[type="submit"] {
+    margin-top: 10px;
 }

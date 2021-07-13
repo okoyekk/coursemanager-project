@@ -4,17 +4,27 @@
 <h1>All Submissions for "{{assignment.title}}" in "{{course.name}}"</h1>
 <div class="course-section">
   {% for submission in submissions %}
-  <p>{{submission}}</p>
-  <p>{{submission.student.user}}</p>
-  <p>Answer: {{submission.text}}</p>
-  <p>Current Score: {{submission.score}}/{{submission.assignment.points}}</p>
-  <form class="button-form" action="{% url 'grade-submission' submission_id=submission.id %}"
-    method="GET">
-    <input class="btn btn-outline-primary" type="submit" value="Grade Submission" />
-  </form>
-  <hr>
+
+
+  <div class="card" style="max-width: 400px;">
+    <div class="card-body">
+      <h5 class="card-title">By {{submission.student.user}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Current Score: {{submission.score}}/{{submission.assignment.points}}
+      </h6>
+      <p class="card-text">
+        <strong>Answer:</strong> {{submission.text}} <br>
+      </p>
+      <form class="button-form" action="{% url 'grade-submission' submission_id=submission.id %}" method="GET">
+        <input class="btn btn-outline-primary" type="submit" value="Grade Submission" />
+      </form>
+    </div>
+  </div>
   {% empty %}
-  <p>No submission has been made for this class yet</p>
+  <div class="card">
+    <div class="card-body">
+      <p>No submission has been made for this class yet</p>
+    </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock body %}

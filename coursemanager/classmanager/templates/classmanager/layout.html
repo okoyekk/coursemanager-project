@@ -37,6 +37,12 @@
                     {% endif %}
                     <!-- View Specific links on the left part of the nav -->
                     {% block left-nav %}
+                    {% if user.is_student %}
+                    <a class="nav-link active" aria-current="page" href="{% url 'view-joined-courses' %}">My Courses</a>
+                    {% endif %}
+                    {% if user.is_instructor %}
+                    <a class="nav-link active" aria-current="page" href="{% url 'view-created-courses' %}">My Courses</a>
+                    {% endif %}
                     {% endblock left-nav %}
                     <!-- Contact page to be implemented later -->
                     <a class="nav-link" href="{% url 'contact_us' %}">Contact us</a>

@@ -4,12 +4,23 @@
 <h1>All your submissions in "{{course.name}}"</h1>
 <div class="course-section">
   {% for submission in submissions %}
-  <p>{{submission}}</p>
-  <p>{{submission.assignment.title}}</p>
-  <p>Answer: {{submission.text}}</p>
-  <p>Current Score: {{submission.score}}/{{submission.assignment.points}}</p>
+  <div class="card" style="max-width: 400px;">
+    <div class="card-body">
+      <h5 class="card-title">{{submission.assignment.title}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Current Score: {{submission.score}}/{{submission.assignment.points}}</h6>
+      <p class="card-text">
+        <strong>Description:</strong> {{submission.assignment.description}} <br>
+        <strong>Answer:</strong> {{submission.text}} <br>
+      </p>
+    </div>
+  </div>
+
   {% empty %}
-  You have not yet submitted anything in this class.
+  <div class="card">
+    <div class="card-body">
+      You have not yet submitted anything in this class.
+    </div>
+  </div>
   {% endfor %}
 </div>
 {% endblock body %}

@@ -1,11 +1,13 @@
 {% extends "classmanager/layout.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block body %}
-  <h1>Register Instructor Role</h1>
-    <!-- Instructor form -->
-  <form action="{% url 'register-role' role='instructor' %}" method="post" id="instructor-form">
-    {% csrf_token %}
-    {{ instructor_form.as_p }}
-    <button class="btn btn-outline-primary" type="submit">Register Instructor</button>
-  </form>
+<h1>Register Instructor Role</h1>
+<!-- Instructor form -->
+<form action="{% url 'register-role' role='instructor' %}" method="post" id="instructor-form">
+  {% csrf_token %}
+  {{ instructor_form|crispy }}
+  <button class="btn btn-outline-primary" type="submit">Register Instructor</button>
+</form>
 {% endblock body %}

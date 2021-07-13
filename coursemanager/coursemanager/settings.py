@@ -36,9 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'classmanager'
+    'classmanager',
+    'crispy_forms'
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 AUTH_USER_MODEL = 'classmanager.User'
 
@@ -117,6 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 import os.path
+
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join('static'),)

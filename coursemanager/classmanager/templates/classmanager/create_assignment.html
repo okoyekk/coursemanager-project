@@ -1,10 +1,12 @@
 {% extends "classmanager/layout.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block body %}
-  <h1>Create an Assignment for {{course.name}}</h1>
-  <form action="{% url 'create-assignment' course_id=course.id %}" method="post">
-    {% csrf_token %}
-    {{assignment_form.as_p}}
-    <button class="btn btn-outline-primary" type="submit">Create Assignment</button>
-  </form>
+<h1>Create an Assignment for {{course.name}}</h1>
+<form action="{% url 'create-assignment' course_id=course.id %}" method="post">
+  {% csrf_token %}
+  {{assignment_form|crispy}}
+  <button class="btn btn-outline-primary" type="submit">Create Assignment</button>
+</form>
 {% endblock body %}
