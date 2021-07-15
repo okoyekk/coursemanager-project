@@ -43,7 +43,7 @@ Classmanager is built using the Django framework and the Python language for the
 - To access the application, you open your browser and navigate to `localhost:8000`.
 (If you experience any errors, you could open an issue in the issues tab of this github repository)
 Lastly, Thank You for viewing my project!
-### Screenshots
+## Screenshots
 ![Application Home Page](https://i.imgur.com/8UxVaa2.png)
 Application Home Page
 ![User Registration Page](https://i.imgur.com/hDCaG5u.png)
