@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from datetime import date, timedelta
 
 
-# Create your models here.
 class User(AbstractUser):
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)

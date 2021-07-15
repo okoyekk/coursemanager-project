@@ -3,3 +3,5 @@ coursemanager/coursemanager/secret_settings.py
 /venv/
 /.idea/
 coursemanager/db.sqlite3
+/coursemanager/.coverage
+/coursemanager/htmlcov/
