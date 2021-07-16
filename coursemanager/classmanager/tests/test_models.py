@@ -15,15 +15,6 @@ def create_users():
     return u1, u2, u3
 
 
-def create_courses():
-    # creates 3 users and 2 courses with u2 as instructor of both
-    _, u2, _ = create_users()
-    i1 = Instructor.objects.create(user=u2, department="Science")
-    c1 = Course.objects.create(instructor=i1, name="Physics 1", department="Science", credits=4, description="")
-    c2 = Course.objects.create(instructor=i1, name="Astrophysics", department="Science", credits=4, description="")
-    return c1, c2
-
-
 def get_users():
     # returns all 3 users
     return User.objects.get(id=1), User.objects.get(id=2), User.objects.get(id=3)
@@ -35,6 +26,15 @@ def create_students():
     s1 = Student.objects.create(user=u1, major="Math", standing="SM", credits=30)
     s2 = Student.objects.create(user=u3, major="Technology", standing="SR", credits=100)
     return s1, s2
+
+
+def create_courses():
+    # creates 3 users and 2 courses with u2 as instructor of both
+    _, u2, _ = create_users()
+    i1 = Instructor.objects.create(user=u2, department="Science")
+    c1 = Course.objects.create(instructor=i1, name="Physics 1", department="Science", credits=4, description="")
+    c2 = Course.objects.create(instructor=i1, name="Astrophysics", department="Science", credits=4, description="")
+    return c1, c2
 
 
 class StudentModelTest(TestCase):

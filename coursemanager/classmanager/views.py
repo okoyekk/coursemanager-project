@@ -66,6 +66,7 @@ def register_user(request):
                 # TODO add javascript validation to avoid this
                 if user_form["password"] != user_form["confirmation"]:
                     context["failure_message"] = "Passwords do not match, please correct it."
+                    return render(request, "classmanager/register.html", context)
                 else:
                     # Attempt creating a new user
                     user = User.objects.create_user(username=username, email=user_form["email"], password=password,
@@ -82,6 +83,11 @@ def register_user(request):
             else:
                 context["success_message"] = "User created, now fill out either a Student or Instructor form"
             return render(request, "classmanager/register_user.html", context)
+        # if user is authenticated, failure message to register.html
+        else:
+            context["failure_message"] = "Sorry, you cannot register another user account while logged in." \
+                                         " Please log out and try again"
+            return render(request, "classmanager/register.html", context)
     else:
         return render(request, "classmanager/register_user.html")
 
@@ -115,12 +121,8 @@ def register_role(request, role):
                     request.user.is_instructor = True
                 request.user.save()
         else:
-            # Send user error messages based on the situation
-            if not request.user.is_authenticated:
-                context["failure_message"] = f"Sorry, you need a User account to be able to register for your {role} " \
-                                             "account "
-            else:
-                context["failure_message"] = "Sorry, form is not valid, please correct it or refresh it!"
+            # Send user error message if form is invalid
+            context["failure_message"] = "Sorry, form is not valid, please correct it or refresh it!"
         # render form success or failure page based on role
         return render(request, f"classmanager/register_{role}.html", context)
     else:

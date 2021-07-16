@@ -44,7 +44,8 @@ class CreationFormTests(TestCase):
 
     def test_valid_course_form(self):
         for course in Course.objects.all():
-            data = {"name": course.name, "department": course.department, "length": course.length}
+            data = {"name": course.name, "department": course.department, "length": course.length,
+                    "credits": course.credits}
             form = CourseCreationForm(data=data)
             self.assertTrue(form.is_valid())
 

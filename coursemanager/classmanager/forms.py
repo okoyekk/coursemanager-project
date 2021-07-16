@@ -33,7 +33,7 @@ class InstructorRegisterForm(ModelForm):
 class CourseCreationForm(ModelForm):
     class Meta:
         model = Course
-        fields = ["name", "department", "description", "length"]
+        fields = ["name", "department", "description", "length", "credits"]
 
 
 class AnnouncementCreationForm(ModelForm):
