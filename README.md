@@ -1,5 +1,5 @@
 # Classmanager
-Classmanager is an interactive web application which allows **users** to manage a course effectively as an **instructor** or attend multiple classes as a **student**.
+Classmanager is a dynamic web application which allows **users** to manage a course effectively as an **instructor** or attend multiple classes as a **student**.
 Classmanager is built using the Django framework and the Python language for the server side and HTML, CSS, JavaScript and Bootstrap for the client side.
 
 ## Operations
