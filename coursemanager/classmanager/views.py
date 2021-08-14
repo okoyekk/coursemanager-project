@@ -623,11 +623,19 @@ def view_finals(request, course_id):
     if request.user.is_instructor:
         grades = Grade.objects.filter(course=course)
         context["grades"] = grades
-    else:
+    elif request.user.is_student:
         user = User.objects.get(pk=request.user.id)
         student = Student.objects.get(user=user)
-        grade = Grade.objects.get(course=course, student=student)
-        context["grade"] = grade
+        try:
+            # check if student has a grade yet
+            grade = Grade.objects.get(course=course, student=student)
+            context["grade"] = grade
+        except Grade.DoesNotExist:
+            # else, pass as it would be handled in template
+            pass
+    else:
+        # if user doesn't have a role, redirect them to index
+        return HttpResponseRedirect(reverse("index"))
     context["course"] = course
     return render(request, "classmanager/view_finals.html", context)
 
