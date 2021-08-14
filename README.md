@@ -30,7 +30,7 @@ Classmanager is built using the Django framework and the Python language for the
  - Leave a course which they are enrolled in
  - View final grade for each enrolled course when they become available
 ## Setup
- - Install the packages in requirements.txt using pip
+ - Install the packages in requirements.txt using `pip install -r requirements.txt`
  - Create a file called `secret_settings.py` in the `./coursemanager/coursemanager/` directory and paste the text `SECRET_KEY = ''` inside it
  - Open a python shell (IDLE) and execute the following:
  `from django.core.management.utils import get_random_secret_key`
