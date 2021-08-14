@@ -739,3 +739,13 @@ def delete_records(request, course_id):
     attendances = Attendance.objects.filter(student=student, course=course)
     for i in (enrollment, submissions, attendances):
         i.delete()
+
+
+# Common Error Views
+def error_404(request, exception):
+        data = {}
+        return render(request,'classmanager/404.html', data)
+
+def error_500(request):
+        data = {}
+        return render(request,'classmanager/500.html', data)

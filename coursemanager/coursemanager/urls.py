@@ -20,3 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("classmanager.urls"))
 ]
+
+# error handlers for common errors
+handler404 = 'classmanager.views.error_404'
+handler500 = 'classmanager.views.error_500'
