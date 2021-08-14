@@ -2,6 +2,6 @@ coursemanager/coursemanager/secret_settings.py
 *.pyc
 /venv/
 /.idea/
-coursemanager/db.sqlite3
+/coursemanager/db.sqlite3
 /coursemanager/.coverage
 /coursemanager/htmlcov/
