@@ -1,6 +1,7 @@
 # Classmanager
 Classmanager is a dynamic web application which allows **users** to manage a course effectively as an **instructor** or attend multiple classes as a **student**.
-Classmanager is built using the Django framework and the Python language for the server side and HTML, CSS, JavaScript and Bootstrap for the client side.
+It is built using the Django framework and the Python language for the server side and HTML, CSS, JavaScript and Bootstrap for the client side.
+This project is currently deployed to heroku and can be viewed [Here](https://coursemanager-project.herokuapp.com/)
 
 ## Operations
 ### Unauthenticated users
