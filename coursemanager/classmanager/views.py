@@ -389,6 +389,8 @@ def create_submission(request, course_id, assignment_id):
     context["course"] = course
     assignment = Assignment.objects.get(pk=assignment_id)
     context["assignment"] = assignment
+    student = Student.objects.get(pk=request.user)
+    context["student"] = student
 
     if request.method == "POST":
         submission_form = SubmissionForm(request.POST)
