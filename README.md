@@ -37,7 +37,6 @@ This project is currently deployed to heroku and can be viewed [Here](https://co
  `from django.core.management.utils import get_random_secret_key`
  `print(get_random_secret_key())`
  - Copy the output and paste between the `''` on the first line of `secret_settings.py` and save the file
- - If you want a fresh database, delete `db.sqlite3`
  - move to the `./coursemanager/` directory and run the commands:
 	`python manage.py makemigrations classmanager`, `python manage.py migrate`, and `python manage.py runserver`
 - If all goes well, your web server should be up and running on localhost
